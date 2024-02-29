@@ -1,7 +1,9 @@
 ---
-title: "Untitled"
-format: revealjs
-editor: visual
+format:
+  revealjs: 
+    theme: sky
+    smaller: true
+    scrollable: true
 embed-resources: true
 ---
 
