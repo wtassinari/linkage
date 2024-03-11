@@ -1,0 +1,67 @@
+---
+title: "Record Linkage"
+author: Wagner Tassinari
+date: last-modified
+toc: true
+format:
+  html: 
+    theme: cosmo
+    fontsize: 1.1em
+    linestretch: 1.7
+embed-resources: true
+---
+
+## Bibliotecas
+
+```{r}
+# Carregando as bibliotecas necessárias
+pacman::p_load(tidyverse, lubridate, readr, reclin2,
+               stringi, lubridate, tidyr, digest, DT)
+```
+
+## Limpeza
+
+```{r}
+# Carregando o pacote 'stringi' (caso ainda não esteja instalado)
+# install.packages("stringi")
+limpa_str <- function(x) {
+  # Converter para UTF-8 e remover acentos
+  x <- iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT//IGNORE")
+  # Remover acentos
+  x <- stringi::stri_trans_general(x, "Latin-ASCII")
+  # Converter para caixa alta (maiúsculas)
+  x <- toupper(x)
+  # Substituir "DESCONHECIDO" por um registro em branco
+  x <- gsub("DESCONHECIDO", "", x, ignore.case = TRUE)
+  # Remover caracteres não alfanuméricos
+  x <- gsub("[^[:alnum:]]", " ", x)
+  # Remover preposições
+  x <- gsub("\\bE\\b|\\bDO\\b|\\bDA\\b|\\bDOS\\b|\\bDAS\\b|\\bDE\\b", "", x, ignore.case = TRUE)
+  # Remover espaços extras
+  x <- gsub("\\s+", " ", x)
+  # Comecando pelas palavras: X, NAO, SEM
+  # x <- gsub("^.*|BB|SEM.*|NAO.*", "", x)
+  # Remover espaços no início e no fim da string
+  x <- trimws(x)
+  
+  return(x)
+}
+
+```
+
+## Lendo os bancos
+
+Estes serão os bancos sintéticos que iremos trabalhar: [banco1](https://drive.google.com/file/d/188pv7b-VcKG-1wDdr2XeRJBM9P_1VC0x/view?usp=drive_link) e [banco 2](https://drive.google.com/file/d/1ubzjx8LahmFRRi93SZe5SyW1wFowIy_6/view?usp=sharing)
+
+```{r}
+# Lendo o banco1
+banco1 <- read.csv("banco1.csv") 
+datatable(banco1, options = list(pageLength = 5))
+```
+
+```{r}
+# Lendo o banco2
+banco2 <- read.csv("banco2.csv") 
+datatable(banco2, options = list(pageLength = 5))
+```
+
