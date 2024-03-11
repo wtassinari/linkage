@@ -1,27 +1,126 @@
 ---
+title: "*Record Linkage*"
+subtitle: "Wagner Tassinari"
+author: "*wtassinari@gmail.com*"
+date: "2023-02-08" # -----> Data de publicação
+date-format: short # -----> Formato de data curto: dd/mm/aaaa
+lang: pt
+email: wtassinari@gmail.com
 format:
   revealjs: 
-    theme: sky
-    smaller: true
+    incremental: true 
+    logo: logo.png
+    reference-location: document
+    theme: mytheme.scss
+    # light: [pulse,] # Tema modo claro
+     # dark: [cyborg,mytheme.scss] # Tema modo escuro
+    title-block-banner: true
+    # smaller: true
     scrollable: true
+    transition: slide
+    background-transition: fade
 embed-resources: true
 ---
 
-## Quarto
+## O que é o *Linkage* 
 
-Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <https://quarto.org/docs/presentations/>.
+\
+\
 
-## Bullets
+"... é uma solução para o problema de reconhecer registros em duas tabelas (*banco de dados*) que representam pessoas idênticas, objetos ou eventos (considerados correspondentes)."
 
-When you click the **Render** button a document will be generated that includes:
+::: aside
+*Fellegi IP & Sunter AB (1969) A theory for record linkage.Journal of the American Statistical Association 64, 1183-1210.*
+:::
 
--   Content authored with markdown
--   Output from executable code
+## O que é o *Linkage* 
 
-## Code
+- Determinar se pares de registros de dados descrevem a mesma entidade (geralmente pessoas, organizações, etc.)
 
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+Registros de dados: nomes, endereços, data de nascimento, etc.
+
+- No âmbito dos Sistemas de Informação em Saúde (SIS), a técnica de *linkage* permite a recuperação de registros incompletos ou inconsistentes e, com isso, melhora a completitude e a confiabilidade das informações disponibilizadas
+pelos SIS.
+
+
+## Técnicas de *Linkage*
+
+- **Manual**
+
+  - Não é viável à medida que o número de registros aumenta
+
+- **Determinística**
+
+  - Comparações automáticas onde tudo precisa corresponder ou regras específicas de dados são programadas.
+
+  - Precisa de uma nova regra para cada variação nos dados
+
+  - Não generalizável para outros conjuntos de dados
+   
+- **Probabilística**
+
+  - Estimar a probabilidade de duas entidades serem iguais
+
+  - Lida com dados ausentes e variações na codificação  
+  
+## Probabilistic Matching Workflow
+
+![](Workflow.png){fig-align="center"}
+
+## Etapas para o *Linkage* 
+
+::: {.incremental}
+- Limpeza de dados
+
+- Padronização dos dados
+
+- Remoção de duplicatas
+
+- Identificação de uma chave primária (*primary key*)
+ 
+- Deduplicação
+
+- Identificação das variáveis *chaves* para o o *linkage*
+- 
+:::
+
+## Probabilistic Matching Workflow
+
+- **Preprocessing:** developing link keys, extracting information from link keys, normalization of link keys
+  
+- **Reduction of search space:** Blocking
+Comparison: String metrics, year comparisons, numeric comparisons
+
+- **Classification:** Medidas de Similaridade
+
+- **Final prediction:** cut off scores, validation
+
+https://rpubs.com/ahmademad/RecordLinkage
+
+## Preparação dos bancos de dados
+
+- É importante que, antes de iniciar o processo de vinculação de dados, sejam definidas asvariáveis a serem utilizadas para a análise dos dados vinculados.
+
+- Após a limpeza e padronização dessas informações, é possível explorar o banco de dados para verif icação de registros duplicados. 
+
+## Exemplo
+
+Nesta aula vamos utilizar bancos de dados simulados com informações hipotéticas sobre id, nome do paciente, nome da mãe e sua data de nascimento.
 
 ```{r}
-1 + 1
+# Bibliotecas
+pacman::p_load(lubridate, abjutils, tidyverse, stringi)
 ```
+
+## Exemplo
+
+
+[Exemplo com dados simulados](exemplo/exemplo.html)
+
+## Conclusions
+
+- Without a significant amount of clerical review, it???s hard to understand linkage quality
+
+- RecordLinkage package makes it simple to obtain initial links
+
+- Given a set of reliable links that are representative, we can study linkage parameters and attempt to train more sophisticated models.
