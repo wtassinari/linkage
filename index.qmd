@@ -9,7 +9,7 @@ email: wtassinari@gmail.com
 format:
   revealjs: 
     incremental: true 
-    logo: logo.png
+    logo: figuras\logo.png
     reference-location: document
     theme: mytheme.scss
     # light: [pulse,] # Tema modo claro
@@ -35,15 +35,13 @@ embed-resources: true
 
 ## O que é o *Linkage* 
 
-- Determinar se pares de registros de dados descrevem a mesma entidade (geralmente pessoas, organizações, etc.)
-
-Registros de dados: nomes, endereços, data de nascimento, etc.
+- Determinar se pares de registros de dados descrevem a mesma entidade (geralmente pessoas, organizações, etc.), através de atributos desses registros, ex: CPF, CNS, Nome, Endereço, Data de Nascimento, etc.
 
 - No âmbito dos Sistemas de Informação em Saúde (SIS), a técnica de *linkage* permite a recuperação de registros incompletos ou inconsistentes e, com isso, melhora a completitude e a confiabilidade das informações disponibilizadas
 pelos SIS.
 
 
-## Técnicas de *Linkage*
+## Tipos de *Linkage*
 
 - **Manual**
 
@@ -63,9 +61,7 @@ pelos SIS.
 
   - Lida com dados ausentes e variações na codificação  
   
-## Probabilistic Matching Workflow
 
-![](Workflow.png){fig-align="center"}
 
 ## Etapas para o *Linkage* 
 
@@ -84,16 +80,19 @@ pelos SIS.
 - 
 :::
 
-## Probabilistic Matching Workflow
+## Fluxo do Linkage Probabilístico
 
-- **Preprocessing:** developing link keys, extracting information from link keys, normalization of link keys
-  
-- **Reduction of search space:** Blocking
-Comparison: String metrics, year comparisons, numeric comparisons
+![](figuras/Workflow.png){fig-align="center"}
 
-- **Classification:** Medidas de Similaridade
+## Fluxo do Linkage Probabilístico
 
-- **Final prediction:** cut off scores, validation
+- **Pré-processamento:** desenvolvimento de chaves de relacionamento, ex: concatenação de atributos (ex: nome + nome da mãe + data do nascimento) de forma direta ou via criptografia (ex: HASH MD5)
+
+- **Redução do espaço de busca**: Comparação via estratégias de blocagem, ex: primeiro nome, ultimo nome, ano de nascimento, nome do bairro, etc.
+
+- **Classificação:** Comparação dos atributos via medidas de similaridade
+
+- **Preditor final:** pontos de corte dos scores e validação
 
 https://rpubs.com/ahmademad/RecordLinkage
 
@@ -107,15 +106,8 @@ https://rpubs.com/ahmademad/RecordLinkage
 
 Nesta aula vamos utilizar bancos de dados simulados com informações hipotéticas sobre id, nome do paciente, nome da mãe e sua data de nascimento.
 
-```{r}
-# Bibliotecas
-pacman::p_load(lubridate, abjutils, tidyverse, stringi)
-```
+Clique [aqui](exemplo/exemplo.html) para acessar o script.
 
-## Exemplo
-
-
-[Exemplo com dados simulados](exemplo/exemplo.html)
 
 ## Conclusions
 
