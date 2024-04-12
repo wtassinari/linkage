@@ -12,7 +12,7 @@ format:
     incremental: true 
     logo: figuras\logo.png
     reference-location: document
-    theme: [../Aula_Linkage/metropolis-theme/metropolis.scss]
+    theme: [metropolis-theme/metropolis.scss]
     toc: true
     toc-depth: 1
     chalkboard: true
