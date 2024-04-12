@@ -1,27 +1,271 @@
 ---
 title: "Record Linkage"
-format: html
-editor: visual
-embed-resources: true
+author: "Wagner Tassinari"
+date: "13/03/2024"
+lang: pt-BR
+toc: true
+toc-title: "Tópicos"
+format: 
+  html: 
+    theme: cosmo 
+    fontsize: 1.1em 
+    linestretch: 1.7 
+    embed-resources: true
 ---
 
-## Quarto
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+<!-- # Customizar o cabeçalho (dependendo da sua ferramenta) -->
+<!-- # header-includes: -->
+<!-- # Se estiver usando LaTeX através do Pandoc -->
+\usepackage[brazil]{babel} 
+\renewcommand{\authorname}{Autor}
+\renewcommand{\datename}{Publicado}
 
-## Running Code
+# Preparação dos Bancos 
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
-```
-
-You can add options to executable code like this
+## Bibliotecas
 
 ```{r}
-#| echo: false
-2 * 2
+# Carregando as bibliotecas necessárias
+pacman::p_load(tidyverse, lubridate, readr, reclin2,
+               stringi, lubridate, tidyr, digest, DT, stringdist)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## Função de Limpeza
+
+```{r}
+limpa_str <- function(x) {
+  # Converter para UTF-8 
+  x <- iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT//IGNORE")
+  # Remover acentos
+  x <- stringi::stri_trans_general(x, "Latin-ASCII")
+  # Converter para caixa alta (maiúsculas)
+  x <- toupper(x)
+  # Substituir "DESCONHECIDO" por um registro em branco
+  x <- gsub("DESCONHECIDO", "", x, ignore.case = TRUE)
+  # Remover caracteres não alfanuméricos
+  x <- gsub("[^[:alnum:]]", " ", x)
+  # Remover preposições
+  x <- gsub("\\bE\\b|\\bDO\\b|\\bDA\\b|\\bDOS\\b|\\bDAS\\b|\\bDE\\b", "", x, ignore.case = TRUE)
+  # Remover espaços extras
+  x <- gsub("\\s+", " ", x)
+  # Remover espaços no início e no fim da string
+  x <- trimws(x)
+  
+  return(x)
+}
+
+```
+
+## Lendo os bancos
+
+Estes serão os bancos sintéticos que iremos trabalhar: [banco1](https://drive.google.com/file/d/188pv7b-VcKG-1wDdr2XeRJBM9P_1VC0x/view?usp=drive_link) e [banco 2](https://drive.google.com/file/d/1ubzjx8LahmFRRi93SZe5SyW1wFowIy_6/view?usp=sharing)
+
+```{r}
+# Lendo o banco1
+banco1 <- read.csv("banco1.csv") 
+datatable(banco1, options = list(pageLength = 5))
+```
+
+```{r}
+# Lendo o banco2
+banco2 <- read.csv("banco2.csv") 
+datatable(banco2, options = list(pageLength = 5))
+```
+
+
+## Rodando a Função Limpeza
+
+```{r}
+banco1$nome <- limpa_str(banco1$nome)
+banco2$nome <- limpa_str(banco2$nome)
+
+banco1$nome_mae <- limpa_str(banco1$nome_mae)
+banco2$nome_mae <- limpa_str(banco2$nome_mae)
+
+banco1$dt_nasc <- as.character(banco1$dt_nasc)
+banco2$dt_nasc <- as.character(banco2$dt_nasc)
+
+# Remover registros duplicados em cada banco de dados
+banco1 <- distinct(banco1)
+banco2 <- distinct(banco2)
+```
+
+# Linkage Determinístico
+
+## Utilizando uma chave primária original
+
+```{r}
+# Vinculando as bases utilizando o id
+bancos_unidos1 <- merge(banco1, banco2, by = "id")
+dim(bancos_unidos1)
+```
+
+Foram encontrados 15 registros comuns entre os bancos.
+
+```{r}
+datatable(bancos_unidos1, options = list(pageLength = 5))
+```
+
+Reparem bem os registros:
+
+ - O registro cujo **id = 6**  o **PEDRO RODRIGUES OLIVEIRA** é de fato a mesma pessoa ? Reparem o nome da mãe e a data de nascimento ?
+ - O registro cujo **id = 39**  o **CARLOS OLIVEIRA PEREIRA** é de fato a mesma pessoa ? Reparem o nome da mãe ?
+ - O registro cujo **id = 53**  o **LUISA MARTINS COSTA** é de fato a mesma pessoa ? Reparem o nome do banco 1 e diferente do banco 2 **MARIANNA SANTOS RODRIGUEZ** ?
+ - O registro cujo **id = 83**  o **LUIZA SILVA SANTOS** é de fato a mesma pessoa ? Reparem o sexo e o nome da mãe ?
+ - O registro cujo **id = 87**  o **JOAO PEREIRA SANTOS** é de fato a mesma pessoa ? Reparem na data de nascimento ?
+
+## Utilizando uma chave SLK
+
+SLK: *Statistical Linkage Key*
+
+```{r}
+# Criando SLK com o nome + sexo + ano nascimento 
+banco1$hash <- paste0(banco1$nome, banco1$nome_mae, banco1$sexo, banco1$dt_nasc)
+banco1$hash <- sapply(banco1$hash, digest, algo="md5")
+
+banco2$hash <- paste0(banco2$nome, banco2$nome_mae, banco2$sexo, banco2$dt_nasc)
+banco2$hash <- sapply(banco2$hash, digest, algo="md5")
+```
+
+```{r}
+# Vinculando as bases utilizando o hash
+bancos_unidos2 <- merge(banco1, banco2, by = "hash")
+dim(bancos_unidos2)
+```
+
+Foram encontrados 9 registros comuns entre os bancos.
+
+```{r}
+datatable(bancos_unidos2, options = list(pageLength = 5))
+```
+
+# Linkage Probabilístico
+
+## Preparando as variáveis 
+
+```{r}
+# Extraindo o primeiro nome
+banco1$primeiro_nome <- sapply(strsplit(banco1$nome , ' '), function(x) x[1])
+banco2$primeiro_nome <- sapply(strsplit(banco2$nome , ' '), function(x) x[1])
+
+# Extraindo o último nome
+banco1$ultimo_nome <- sapply(strsplit(banco1$nome, ' '), function(x) x[length(x)])
+banco2$ultimo_nome <- sapply(strsplit(banco2$nome, ' '), function(x) x[length(x)])
+
+# Extraindo o primeiro nome da mãe
+banco1$primeiro_nomemae <- sapply(strsplit(banco1$nome_mae, ' '), function(x) x[1])
+banco2$primeiro_nomemae <- sapply(strsplit(banco2$nome_mae , ' '), function(x) x[1])
+
+# Extraindo o ultimo nome da mãe
+banco1$ultimo_nomemae <- sapply(strsplit(banco1$nome_mae, ' '), function(x) x[length(x)])
+banco2$ultimo_nomemae <- sapply(strsplit(banco2$nome_mae, ' '), function(x) x[length(x)])
+```
+
+## Utilizando o Soundex
+
+```{r}
+banco1$primeiro_nome <- phonetic(banco1$primeiro_nome)
+banco2$primeiro_nome <- phonetic(banco2$primeiro_nome)
+
+banco1$ultimo_nome <- phonetic(banco1$ultimo_nome)
+banco2$ultimo_nome <- phonetic(banco2$ultimo_nome)
+
+banco1$primeiro_nomemae <- phonetic(banco1$primeiro_nomemae)
+banco2$primeiro_nomemae <- phonetic(banco2$primeiro_nomemae)
+
+banco1$ultimo_nomemae <- phonetic(banco1$ultimo_nomemae)
+banco2$ultimo_nomemae <- phonetic(banco2$ultimo_nomemae)
+```
+
+## Biblioteca [reclin2](https://github.com/djvanderlaan/reclin2)
+
+```{r}
+library(reclin2)
+```
+
+Em princípio, linkage consiste em comparar cada combinação de registos de dois conjuntos de dados e determinar quais dessas combinações (ou pares) pertencem à mesma entidade. No caso de uma chave de ligação perfeita, obviamente não é necessário comparar todas as combinações de registros, mas quando as chaves de ligação são imperfeitas e contêm erros, é em princípio necessário comparar todos os pares.
+
+No entanto, comparar todos os pares pode resultar num número intratável de pares: ao ligar dois conjuntos de dados com um milhão de registos, existem 1012 pares possíveis. Portanto, geralmente é aplicado algum tipo de redução dos pares possíveis. 
+
+No exemplo abaixo aplicamos o bloco (ou bloqueio), o que significa que os pares só são gerados quando concordam com a variável de bloco (neste caso o usaremos o primeiro_nome, o último_nome e o primeiro_nomemae). Isso significa que pares de registros que discordam na variável de bloco não são considerados pares. Portanto, só serão utilizadas variáveis que possam ser consideradas sem erros como variáveis de bloco, ou vinculadas múltiplas vezes com diferentes variáveis de bloqueio e combinados os dois conjuntos de dados.
+
+**Passo 1:** O primeiro passo na ligação (probabilística) é, portanto, gerar todos os pares.
+
+```{r}
+pares <- pair_blocking(banco1, banco2, c("primeiro_nome", "ultimo_nome", "primeiro_nomemae"))
+datatable(pares, options = list(pageLength = 5))
+```
+
+Como vocês podem ver, os registro 6 e 10 de x (o primeiro conjunto de dados) estão sendo comparados aos registros 8 e 9 de y, ou seja, abos com os mesmo primeiros e ultimos nomes.
+
+**Passo 2:** Comparação dos pares
+
+```{r}
+pares <- compare_pairs(pares, on = c("nome", "nome_mae", "sexo", "dt_nasc"), default_comparator = cmp_jarowinkler(0.9), inplace = TRUE)
+
+datatable(pares, options = list(pageLength = 5))
+```
+
+Como podemos ver, não precisamos passar os conjuntos de dados originais, embora as variáveis nome, nome_mae, dt_nasc sejam desses conjuntos de dados originais. Isso ocorre porque uma cópia dos conjuntos de dados originais é armazenada com os pares de objetos (e você deve estar preocupado com a memória: desde que os conjuntos de dados originais não sejam modificados, os conjuntos de dados não são realmente copiados).
+
+A função de comparação padrão retorna TRUE quando as chaves de ligação concordam e false quando não concordam. No entanto, ao observar os conjuntos de dados originais, podemos ver que a maioria de nossas chaves de ligação são variáveis de string que contêm erros de digitação. A qualidade da nossa ligação poderia ser melhorada se pudéssemos usar uma pontuação de similaridade para comparar as duas cadeias: uma pontuação alta significa que as duas cadeias são muito semelhantes, um valor próximo de zero significa que as cadeias são muito diferentes.
+
+**Passo 3:** Escore dos pares
+
+A próxima etapa do processo é determinar quais pares de registros pertencem à mesma entidade e quais não. Existem inúmeras maneiras de fazer isso. Uma possibilidade é rotular alguns dos pares como correspondentes ou não e usar algum algoritmo de aprendizado de máquina para prever o status da correspondência usando os vetores de comparação.
+
+Tradicionalmente, é utilizado o quadro de ligação probabilística inicialmente formalizado por Fellegi e Sunter. A função $problink_{em}$ usa um algoritmo EM para estimar as chamadas probabilidades *m* e *u* para cada uma das variáveis de ligação. 
+
+A probabilidade *m* é a probabilidade de dois registros relativos à mesma entidade concordarem na variável de ligação; isso significa que a probabilidade *m* corresponde à probabilidade de haver erro nas variáveis de ligação. 
+
+A probabilidade *u* é a probabilidade de dois registros pertencentes a entidades diferentes concordarem em uma variável. Para uma variável com poucas categorias (como o sexo) esta probabilidade será grande, enquanto que para uma variável com um grande número de categorias (como o sobrenome) esta probabilidade será pequena.
+
+```{r}
+m <- problink_em(~ nome + nome_mae + sexo + dt_nasc, data = pares)
+print(m)
+```
+Essas probabilidades *m* e *u* podem ser usadas para pontuar os pares:
+
+```{r}
+pares <- predict(m, pairs = pares, add = TRUE)
+print(pares)
+```
+
+Um método mais simples é basear a pontuação diretamente nas pontuações de similaridade, calculando uma soma (ponderada) das pontuações de similaridade. Quanto maior a pontuação, mais semelhantes são os dois registros do par. No caso mais simples, score_simple apenas calcula a soma das pontuações de similaridade das variáveis comparadas:
+
+```{r}
+pares <- score_simple(pares, "score",  on = c("nome", "nome_mae", "sexo"))
+pares
+```
+**Passo 4:** Selecionando os pares
+
+A etapa final é selecionar os pares que são considerados pertencentes às mesmas entidades. O método mais simples é selecionar todos os pares acima de um determinado limite
+
+```{r}
+pares <- select_threshold(pares, "threshold", score = "weights", threshold = 9)
+print(pares)
+```
+
+As funções selecionadas adicionam uma variável (lógica) ao conjunto de dados indicando se um par está selecionado ou não.
+
+Neste caso sabemos quais registros realmente pertencem um ao outro. Podemos usar isso para avaliar a ligação:
+
+```{r}
+pares <- compare_vars(pares, "truth", on_x = "id", on_y = "id")
+print(pares)
+```
+
+```{r}
+table(pares$truth, pares$threshold)
+```
+
+**Passo Final:** Último Passo !!!!!
+
+A verdadeira etapa final é criar o conjunto de dados consolidado. Agora sabemos quais pares serão consolidados, mas ainda precisamos vinculá-los. A função *link* faz isso (os argumentos opcionais *all_x* e *all_y* controlam o tipo de ligação):
+
+```{r}
+linked_data_set <- link(pares)
+datatable(linked_data_set, options = list(pageLength = 15))
+```
+
