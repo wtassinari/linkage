@@ -9,13 +9,15 @@ lang: pt
 email: wtassinari@gmail.com
 format:
   revealjs:
+    theme: metropolis.scss
     incremental: true 
     logo: figuras\logo.png
     reference-location: document
-    theme: [metropolis-theme/metropolis.scss]
+    # theme: [metropolis-theme/metropolis.scss]
     toc: true
+    embed-resources: true
     toc-depth: 1
-    chalkboard: true
+    # chalkboard: true
     menu: true
     scrollable: true
     transition: slide
