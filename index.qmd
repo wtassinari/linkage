@@ -2,7 +2,8 @@
 title: "*Record Linkage no âmbito das bases de dados do SUS*"
 subtitle: "Wagner Tassinari"
 author: "*wtassinari@gmail.com*"
-# institute: "DEMAT/ICE/UFRRJ"
+institute: "DEMAT/ICE/UFRRJ & CIE/SMS-Rio"
+ 
 date: "2023-05-28" # -----> Data de publicação
 date-format: short # -----> Formato de data curto: dd/mm/aaaa
 lang: pt
@@ -27,23 +28,22 @@ format:
 ## O que é o *Record Linkage* 
 
 
-- "... é uma solução para o problema em identificar registros em duas bases de dados que representam a mesma entidade (ex: pessoas, objetos ou eventos) idênticas, ou seja, registros considerados correspondentes." *(Fellegi IP & Sunter AB, 1969)*
+- "... é uma solução para o problema em identificar registros em duas bases de dados que representam entidades idênticas, ou seja, registros considerados correspondentes (ex: pessoas, lugares, objetos ou eventos de forma geral)." *(Fellegi IP & Sunter AB, 1969)*
 
 
-- Para esta tarefa, podemos utilizar as chaves primárias existente nas bases de dados (ex: CPF, CNS, DNV, DO, prontuário, etc.) ou os próprios atributos inerentes a cada registro (ex: nome, nome da mãe, data de nascimento, etc.)
+- Para esta tarefa, o mais comum é utilizar as **chaves primárias** (identificador único) já existentes nas bases de dados (ex: CPF, CNS, DNV, DO, no prontuário, código do município, código do setor censitário, etc.) ou até mesmo os próprios atributos inerentes a cada registro (ex: nome, nome da mãe, data de nascimento, nome do bairro, etc.)
 
 ::: aside
-*Fellegi IP & Sunter AB (1969) A theory for record linkage.Journal of the American Statistical Association 64, 1183-1210.*
+*Fellegi IP & Sunter AB (1969) A theory for record linkage. Journal of the American Statistical Association 64, 1183-1210.*
 :::
 
 ## *Record Linkage* em bases de dados do SUS
 
 ::: {.incremental}
-- Um dos maiores desafios enfrentados pelas bases de dados do SUS é a ausência de um identificador único para os pacientes. Esta lacuna complica a identificação de um mesmo indivíduo em diferentes bases, tornando mais complexa a tarefa de acompanhar e avaliar o histórico de saúde completo de uma pessoa. 
 
-- Sem um identificador unificado, pode ser difícil conectar as várias interações de um paciente no SIH, impossibilitanto assim a avaliação de seu histórico médico.
+- O Record Linkage, no contexto das bases de dados do Sistema Único de Saúde (SUS) do Brasil, é um processo essencial. Ele envolve a integração e comparação de registros de diferentes bases de dados para identificar registros que se referem ao mesmo indivíduo ou evento.
 
-- O Record Linkage, no contexto das bases de dados do Sistema Único de Saúde (SUS) do Brasil, é um processo essencial. Ele envolve a integração e comparação de registros de diferentes bases de dados para identificar registros que se referem ao mesmo indivíduo ou evento. 
+- Um dos maiores desafios enfrentados pelas bases de dados do SUS é a ausência de um identificador único para os pacientes comum na maioria das bases de dados. Esta lacuna complica a identificação de um mesmo indivíduo em diferentes bases, tornando mais complexa a tarefa de acompanhar e avaliar o histórico de saúde completo de uma pessoa. 
 
 :::
 
@@ -51,10 +51,7 @@ format:
 
 ::: {.incremental}
 
-
-- Isso é particularmente importante ao SUS para a qualificação e a integração de diferentes bases de dados do SUS.
-
-- Por exemplo, um paciente pode ter registros no Sistema de Informações Hospitalares (SIH), no Sistema de Informações Ambulatoriais (SIA), e também no Sistema de Informações sobre Mortalidade (SIM). O Record Linkage permite que esses registros separados sejam unificados, criando um perfil mais completo da trajetória de saúde do paciente. Isso é crucial para a continuidade do cuidado, a avaliação da qualidade dos serviços, a realização de estudos epidemiológicos e para o planejamento em saúde.
+- Por exemplo, um paciente pode ter registros no Sistema de Informações Hospitalares (SIH), no Sistema de Informações Ambulatoriais (SIA), e também no Sistema de Informações sobre Mortalidade (SIM). O Record Linkage permite que essas bases de dados distintas sejam unificadas, criando um perfil mais completo da trajetória de saúde do paciente. Isso é crucial para a continuidade do cuidado dos indivíduos, a avaliação da qualidade dos serviços, a realização de estudos epidemiológicos e para o planejamento em saúde.
 
 :::
 
@@ -62,59 +59,73 @@ format:
 
 - **Manual**
 
-  - Não é viável à medida que o número de registros aumenta
+  - Não é viável à medida que o número de registros aumenta.
 
-- **Determinística**
+- **Determinístico**
 
-  - Comparações automáticas onde tudo precisa corresponder ou regras específicas de dados são programadas.
+  - Comparações automáticas onde tudo precisa corresponder ou regras específicas de dados devem ser programadas.
 
-  - Precisa de uma nova regra para cada variação nos dados
+  - Precisa de uma nova regra para cada variação nos dados.
 
-  - Não generalizável para outros conjuntos de dados
+  - Não generalizável para outros conjuntos de dados.
    
-- **Probabilística**
+- **Probabilístico**
 
-  - Estimar a probabilidade de duas entidades serem iguais
+  - Estimar a probabilidade de duas entidades serem iguais.
 
-  - Lida com dados ausentes e variações na codificação  
+  - Lida com dados ausentes e variações na codificação.  
   
 
 ## *Linkage* Determinístico
 
-![[Fonte](https://medium.com/psicodata/record-linkage-fundamentos-sus-31beb1aafd6b)](figuras/linkage_deterministico.png){width=150%}
+![[Fonte: Fundamentos de Record Linkage e sua aplicação nas bases de dados do SUS](https://medium.com/psicodata/record-linkage-fundamentos-sus-31beb1aafd6b)](figuras/linkage_deterministico.png){width=50, fig-align="center"}
 
 
-- Visa avaliar se os pares de registros são exatamente iguais em um determinado conjunto de indexadores, de modo que a concordância precisa ser total para que dois registros sejam considerados como um match (par).
+- Visa avaliar se os pares de registros são exatamente iguais em ambas as bases de dados, de modo que a concordância precisa ser total para que dois registros sejam considerados como um match (par).
 
-- Percebam que nas duas bases de dados as variáveis são do tipo texto, portanto apenas os registros que são exatamente iguais serão pareados a partir de uma abordagem determinística.
+- Percebam que em ambas as bases de dados, as variáveis são do tipo texto, portanto apenas os registros que são exatamente iguais serão pareados a partir de uma abordagem determinística.
 
 ## *Linkage* Probabilístico
 
-
-![[Fonte](https://medium.com/psicodata/record-linkage-fundamentos-sus-31beb1aafd6b)](figuras/link_probabilistico.webp){width=150%}
+![[Fonte: Fundamentos de Record Linkage e sua aplicação nas bases de dados do SUS](https://medium.com/psicodata/record-linkage-fundamentos-sus-31beb1aafd6b)](figuras/linkage_probabilistico.png){width=50, fig-align="center"}
 
 - Visando resolver as limitações do método determinístico, o probabilístico irá permitir que em um vetor de comparação os resultados não se limitem apenas a 0 (falso) ou 1 (verdadeiro), isso quer dizer que os registros podem ser parcialmente iguais.
 
-- Utilizando a mesma lógica do exemplo anterior, aqui vemos os mesmo sujeitos, porém com um atributo a mais (data de nascimento). Apesar do nome está escrito de maneira distinta, as datas de nascimento são idênticas e portanto, o método probabilístico vai identificar (a partir de um critério pré-definindo) que existe uma alta probabilidade de que sejam os mesmos sujeitos em bases distintas.
+## *Linkage* Probabilístico
 
+- Utilizando a mesma lógica do exemplo anterior, aqui podemos ver os mesmo indivíduos, porém com um atributo a mais (a data de nascimento).
+
+- Apesar do nome está escrito de maneira distinta, as datas de nascimento são idênticas e portanto, o método probabilístico vai identificar (a partir de um critério pré-definindo) que existe uma alta probabilidade de que sejam os mesmos sujeitos nas bases distintas.
 
 https://rpubs.com/ahmademad/RecordLinkage
 
 
 
-## Fluxo do *Record Linkage* 
+## Fluxo de um *Linkage* probabilístico
 
 ::: {#fig-fluxo}
 
-![](figuras/fluxo_linkage.jpg){width=50%, fig-align="center"}
+![](figuras/fluxo_linkage.jpg){width=50, fig-align="center"}
 
-Fluxo de um *Record Linkage*  ([fonte](https://www.researchgate.net/publication/316251682_A_note_on_using_the_F-measure_for_evaluating_record_linkage_algorithms/figures?lo=1))
+ [A note on using the F-measure for evaluating record linkage algorithms](https://www.researchgate.net/publication/316251682_A_note_on_using_the_F-measure_for_evaluating_record_linkage_algorithms/figures?lo=1)
 
 :::
 
+## Fluxo de um *Linkage* probabilístico
+
+- **Pré-processamento:** Limpeza e padronização dos dados, construção das chaves de relacionamento
+
+- **Redução do espaço de pesquisa:** Blocagem
+
+- **Comparação:** métricas de string, comparações de anos, comparações numéricas
+
+- **Classificação:** Modelo Fellegi-Sunter
+
+- **Previsão final:** pontos de corte, validação
+
 ## Limpeza e padronização dos dados
 
-- A preparação de dados é uma etapa crucial antes de iniciar qualquer análise. Neste processo, é essencial padronizar elementos como datas de nascimento, adaptando-os a um formato único. Diferentes bases de dados podem apresentar as datas em estilos variados, como DD/MM/AAAA, MM/DD/AAAA, MM/DD/AA, entre outros. Portanto, é necessário uniformizar estes formatos para assegurar a consistência entre diferentes conjuntos de dados que precisam ser combinados. 
+- A preparação de dados é uma etapa crucial antes de iniciar qualquer análise. Neste processo, é essencial padronizar elementos como por exemplo as datas de nascimento, adaptando-os a um formato únicoDiferentes bases de dados podem apresentar as datas em estilos variados, como *DD/MM/AAAA*, *MM/DD/AAAA*, *MM/DD/AA*, *DD-MM-AAAA*, *DDMMAAAA*, entre outros. Portanto, é necessário uniformizar estes formatos para assegurar a consistência entre diferentes conjuntos de dados que precisam ser combinados. 
 
 - Além disso, uma prática comum na padronização é converter todos os campos de texto para letras maiúsculas e remover caracteres especiais, como *Á, á, ç, Í, í, Ó, â*, entre outros.
 
@@ -123,37 +134,135 @@ Fluxo de um *Record Linkage*  ([fonte](https://www.researchgate.net/publication/
 
 ## Indexação e *blocking*
 
-- Desenvolvimento de chaves de relacionamento, ex: concatenação de atributos (ex: nome + nome da mãe + data do nascimento) de forma direta ou via criptografia (ex: HASH MD5).
+- Desenvolvimento de chaves de relacionamento, por exemplo as *Statistical Linkage Key* (*SLK*). 
 
-- Visando otimizar o processamento computacional, a técnica de indexação vai estabelecer critérios de comparação com o intuito de reduzir os pares e diminuir o custo computacional quando grandes bases de dados forem pareadas.
+- Geralmente as *SLK*'s são formadas pela concatenação de atributos (ex: nome + nome da mãe + data do nascimento) de forma direta ou via criptografia (ex: *HASH MD5*).
+
+
+- Tais estratégias também podem ser usadas para o *linkage* determinístico.
+
+## Indexação e *blocking*
+
+- Visando otimizar o processamento computacional, as técnicas de blocagem irão estabelecer critérios de comparação com o intuito de reduzir os pares e diminuir o custo computacional quando grandes bases de dados forem pareadas.
 
 - Essa comparação é feita via estratégias de blocagem em alguns atributos inerente ao registros que possam ser agrupados, por exemplo: primeiro nome, ultimo nome, ano de nascimento, nome do bairro, etc.
 
+## Indexação e *blocking*
+
 - Nesta etapa, é possível o uso da função chamada *Soundex*, um algoritmo fonético usado principalmente para indexar nomes por som, como eles são pronunciado.
 
-- A função principal do Soundex é codificar palavras (frequentemente nomes próprios) de modo que homófonos sejam codificados para o mesmo valor. Isso torna o Soundex particularmente útil em aplicações onde se deseja encontrar nomes que soam semelhantes, apesar de serem escritos de formas diferentes.
+- A função principal do Soundex é codificar palavras (frequentemente nomes próprios) de modo que homófonos sejam codificados para o mesmo valor. Isso torna o *Soundex* particularmente útil em aplicações onde se deseja encontrar nomes que soam semelhantes, apesar de serem escritos de formas diferentes.
 
 ## Indexação e *blocking*
 
 ```{r, echo=T}
 stringdist::phonetic("Ana")
 stringdist::phonetic("Anna")
+```
 
+## Indexação e *blocking*
+
+```{r, echo=T}
 stringdist::phonetic("Rafael")
 stringdist::phonetic("Raphael")
+```
 
+## Indexação e *blocking*
+
+```{r, echo=T}
 stringdist::phonetic("Eloa")
 stringdist::phonetic("Eloah")
+```
 
+## Indexação e *blocking*
+
+```{r, echo=T}
 stringdist::phonetic("Ana")
 stringdist::phonetic("Hana")
-
 ```
 
 
 ## Comparação
 
-- Comparação dos atributos via métricas de similaridade. São medidas que avalião a similaridade total ou parcial entre uma cadeia de caracteres que compõe uma palavra ou expressão, resultando em uma pontuação. As mais utilizadas são: **Distância de Levenshtein**, **Distância de Jaccard**, **Distância de Jaro**, **Distância de Jaro-Winkler**, **Índice de Dice**, entre outras.
+- Comparação dos atributos via métricas de similaridade. São medidas que irão avaliar a similaridade total ou parcial entre uma cadeia de caracteres que compõe uma palavra ou expressão, resultando em uma pontuação. As mais utilizadas são: 
+
+- **Índice de Dice**: O Índice de Dice é uma medida de similaridade utilizada no contexto de record linkage para quantificar a semelhança entre dois conjuntos de dados, frequentemente usados para avaliar a correspondência entre registros em diferentes bases de dados.
+
+
+<!-- $$D = \frac{2 |A \cap B|}{|A| + |B|}$$ -->
+
+- **Distância de Jaccard**: Mensura a similaridade entre dois conjuntos de strings quantificando a proporção de strings compartilhadas em relação ao total de strings únicas presentes nos dois registros.
+
+<!-- $$\text{Distância de Jaccard} = 1 - \frac{|A \cap B|}{|A \cup B|}$$ -->
+
+## Comparação
+
+- **Distância de Levenshtein**: é uma métrica que mede o número mínimo de operações necessárias para transformar uma sequência de caracteres em outra.
+
+- **Jaro distance**: calcula o número *m*  de caracteres comuns que estão dentro da metade do comprimento da string mais longa e do número de transposições *t*
+
+<!-- $$\text{Jaro dist } = \dfrac{1}{3}(\dfrac{m}{|s_1|} + \dfrac{m}{|s_2|} + \dfrac{m-t}{|m|} )$$ -->
+
+- **Jaro-Winkler distance**: melhora o algoritmo Jaro aplicando ideias baseadas em estudos empíricos – Menos erros ocorrem no início das strings.
+
+## Comparação
+
+```{r, echo=T}
+# Chamando as bibliotecas
+library(stringdist)
+library(proxy)
+
+# Entrando com os dados
+nome1 <- "JOAO SANTO SOUSA"
+nome2 <- "JOAO SANTOS SOUZA"
+```
+
+```{r, echo=T}
+# Índice de Dice (usando o pacote proxy)
+dice_dist <- proxy::dist(x = list(nome1, nome2), method = "Dice")
+dice_sim <- 1 - as.numeric(dice_dist)
+print(paste("Dice Similarity: ", dice_sim))
+```
+
+```{r, echo=T}
+# Distância de Jaccard
+jaccard_dist <- stringdist(nome1, nome2, method = "jaccard")
+jaccard_sim <- 1 - jaccard_dist
+print(paste("Jaccard Similarity: ", jaccard_sim))
+```
+
+## Comparação
+
+```{r, echo=T}
+# Distância de Levenshtein
+levenshtein_dist <- stringdist(nome1, nome2, method = "lv")
+levenshtein_sim <- 1 - (levenshtein_dist / max(nchar(nome1), nchar(nome2)))
+print(paste("Levenshtein Similarity: ", levenshtein_sim))
+```
+
+```{r, echo=T}
+# Distância de Jaro
+jaro_dist <- stringdist(nome1, nome2, method = "jw", p = 0)
+jaro_sim <- 1 - jaro_dist
+print(paste("Jaro Similarity: ", jaro_sim))
+```
+
+```{r, echo=T}
+# Distância de Jaro-Winkler
+jaro_winkler_dist <- stringdist(nome1, nome2, method = "jw", p = 0.1)
+jaro_winkler_sim <- 1 - jaro_winkler_dist
+print(paste("Jaro-Winkler Similarity: ", jaro_winkler_sim))
+```
+
+<!-- $$\text{Jaro-winkler dist } = \text{Jaro dist } + l(1 - \text{Jaro dist })$$ -->
+
+<!-- Sabendo que *l* é o comprimento do prefixo comum no início da string até um máximo de 4 caracteres. -->
+
+## Classificação
+
+![](figuras/IvanFelling.png){width=150, fig-align="center"}
+
+- O modelo Fellegi-Sunter (1969) é um método probabilístico para vinculação de registros que compara campos de diferentes registros, calcula pesos baseados nas probabilidades de correspondência verdadeira e falsa, e usa limiares de decisão para classificar pares como correspondências, não correspondências ou incertos.
 
 ## Deduplicação
 
@@ -162,24 +271,28 @@ Os principais aspectos da técnica de RL é a Deduplicação de dados, isto é, 
 
 ::: {#fig-elephants layout-nrow=2}
 
-![](figuras/deduplicacao.png){#fig-surus}
+![](figuras/deduplicacao.png){width=150, fig-align="center"}
 
-![](figuras/deduplicacao2.png){#fig-hanno}
+![](figuras/deduplicacao2.png){width=150, fig-align="center"}
 
 Deduplicação ([figuras do site da biblioteca Splink](https://moj-analytical-services.github.io/splink/index.html))
 :::
 
+## Pipeline *Linkage* entre SIM vs SINASC
 
-## Conclusions
+![](figuras/pipe_line_sim_sinasc.png){width=150, fig-align="center"}
+
+## Ferramentas
+
+![](figuras/pacotes.png){width=150, fig-align="center"}
+
+## Conclusão
 
 - O processo determinístico de Record Linkage, irá ser responsável pela maioria dos pares.
 
-- Para uma validação satisfatória de um processo de Record Linkage, quase sempre é necessáSem uma quantidade significativa de revisão administrativa, é difícil entender a qualidade da ligação
-é necessário recorrer a revisão manual.
+- Para uma validação satisfatória de um processo de Record Linkage, quase sempre será necessário a revisão manual, até para validação do processo do *Record Linkage*.
 
-- O pacote RecordLinkage simplifica a obtenção de links iniciais
-
-- Dado uma base de dados para treinamento de pares representativos de populações reais e distintas, poderemos estimar os parâmetros para desenvolver modelos mais acertivos.
+- Técnicas baseadas em *Machine Learning*, utilizam uma base de dados para treinamento de pares representativos de populações reais e distintas, é com isso é possível estimar os parâmetros para desenvolver modelos mais acertivos.
 
 ## Exemplo
 
@@ -188,7 +301,7 @@ Nesta aula vamos utilizar bancos de dados simulados com informações hipotétic
 Clique [aqui](exemplo/exemplo.html) para acessar o script.
 
 
-## REFERENCIAS
+## Referencias
 
 - Camargo Jr. KR, Coeli CM. Reclink: aplicativo para o relacionamento de base de dados, implementando o método probabilistic record linkage. Cad Saúde Pública 2000; 16:439-47.
 
