@@ -1,7 +1,7 @@
 ---
-title: "Record Linkage"
+title: "Exercício Record Linkage"
 author: "Wagner Tassinari"
-date: "13/03/2024"
+date: "2023-05-28" 
 lang: pt-BR
 toc: true
 toc-title: "Tópicos"
@@ -13,22 +13,27 @@ format:
     embed-resources: true
 ---
 
-
 <!-- # Customizar o cabeçalho (dependendo da sua ferramenta) -->
+
 <!-- # header-includes: -->
+
 <!-- # Se estiver usando LaTeX através do Pandoc -->
+
+```{=tex}
 \usepackage[brazil]{babel} 
 \renewcommand{\authorname}{Autor}
 \renewcommand{\datename}{Publicado}
-
-# Preparação dos Bancos 
+```
+# Preparação das Bases de Dados
 
 ## Bibliotecas
 
-```{r}
+```{r, message=FALSE, warning=FALSE, comments=NA, fig.height = 5, fig.width = 10, fig.align = "center"}
 # Carregando as bibliotecas necessárias
-pacman::p_load(tidyverse, lubridate, readr, reclin2,
-               stringi, lubridate, tidyr, digest, DT, stringdist)
+library(tidyverse)
+library(DT)
+library(digest)
+library(stringdist)
 ```
 
 ## Função de Limpeza
@@ -73,6 +78,7 @@ banco2 <- read.csv("banco2.csv")
 datatable(banco2, options = list(pageLength = 5))
 ```
 
+# Limpeza e padronização dos dados
 
 ## Rodando a Função Limpeza
 
@@ -83,17 +89,25 @@ banco2$nome <- limpa_str(banco2$nome)
 banco1$nome_mae <- limpa_str(banco1$nome_mae)
 banco2$nome_mae <- limpa_str(banco2$nome_mae)
 
+```
+
+## Transformando as datas para o formato *character*
+
+```{r}
 banco1$dt_nasc <- as.character(banco1$dt_nasc)
 banco2$dt_nasc <- as.character(banco2$dt_nasc)
+```
 
-# Remover registros duplicados em cada banco de dados
+## Removendo os registros duplicados
+
+```{r}
 banco1 <- distinct(banco1)
 banco2 <- distinct(banco2)
 ```
 
 # Linkage Determinístico
 
-## Utilizando uma chave primária original
+## **Opção 1:** Utilizando uma chave primária original
 
 ```{r}
 # Vinculando as bases utilizando o id
@@ -107,20 +121,25 @@ Foram encontrados 15 registros comuns entre os bancos.
 datatable(bancos_unidos1, options = list(pageLength = 5))
 ```
 
-Reparem bem os registros:
+#### ATENÇÂO !!!!! Reparem os registros:
 
- - O registro cujo **id = 6**  o **PEDRO RODRIGUES OLIVEIRA** é de fato a mesma pessoa ? Reparem o nome da mãe e a data de nascimento ?
- - O registro cujo **id = 39**  o **CARLOS OLIVEIRA PEREIRA** é de fato a mesma pessoa ? Reparem o nome da mãe ?
- - O registro cujo **id = 53**  o **LUISA MARTINS COSTA** é de fato a mesma pessoa ? Reparem o nome do banco 1 e diferente do banco 2 **MARIANNA SANTOS RODRIGUEZ** ?
- - O registro cujo **id = 83**  o **LUIZA SILVA SANTOS** é de fato a mesma pessoa ? Reparem o sexo e o nome da mãe ?
- - O registro cujo **id = 87**  o **JOAO PEREIRA SANTOS** é de fato a mesma pessoa ? Reparem na data de nascimento ?
+<p>- O registro cujo **id = 6** o **PEDRO RODRIGUES OLIVEIRA** é de fato a mesma pessoa ? Reparem o nome da mãe e a data de nascimento ?</p>
 
-## Utilizando uma chave SLK
+<p>- O registro cujo **id = 39** o **CARLOS OLIVEIRA PEREIRA** é de fato a mesma pessoa ? Reparem o nome da mãe ?</p>
 
-SLK: *Statistical Linkage Key*
+<p>- O registro cujo **id = 53** o **LUISA MARTINS COSTA** é de fato a mesma pessoa ? Reparem o nome do banco 1 e diferente do banco 2 **MARIANNA SANTOS RODRIGUEZ** ?</p>
+
+<p>- O registro cujo **id = 83** o **LUIZA SILVA SANTOS** é de fato a mesma pessoa ? Reparem o sexo e o nome da mãe ?</p>
+
+<p>- O registro cujo **id = 87** o **JOAO PEREIRA SANTOS** é de fato a mesma pessoa ? Reparem na data de nascimento ?</p>
+
+## **Opção 2:** Utilizando uma chave SLK
+
+<p>SLK: *Statistical Linkage Key*</p>
+
+#### Criando SLK com o nome + sexo + ano nascimento
 
 ```{r}
-# Criando SLK com o nome + sexo + ano nascimento 
 banco1$hash <- paste0(banco1$nome, banco1$nome_mae, banco1$sexo, banco1$dt_nasc)
 banco1$hash <- sapply(banco1$hash, digest, algo="md5")
 
@@ -128,21 +147,24 @@ banco2$hash <- paste0(banco2$nome, banco2$nome_mae, banco2$sexo, banco2$dt_nasc)
 banco2$hash <- sapply(banco2$hash, digest, algo="md5")
 ```
 
+#### Vinculando as bases utilizando o *hash*
+
 ```{r}
-# Vinculando as bases utilizando o hash
 bancos_unidos2 <- merge(banco1, banco2, by = "hash")
 dim(bancos_unidos2)
 ```
 
-Foram encontrados 9 registros comuns entre os bancos.
+<p>Foram encontrados 9 registros comuns entre os bancos.</p>
 
 ```{r}
 datatable(bancos_unidos2, options = list(pageLength = 5))
 ```
 
+#### Dessa forma, garantimos que os pares sejam exatamente os mesmos.
+
 # Linkage Probabilístico
 
-## Preparando as variáveis 
+## Separando os nomes
 
 ```{r}
 # Extraindo o primeiro nome
@@ -162,7 +184,7 @@ banco1$ultimo_nomemae <- sapply(strsplit(banco1$nome_mae, ' '), function(x) x[le
 banco2$ultimo_nomemae <- sapply(strsplit(banco2$nome_mae, ' '), function(x) x[length(x)])
 ```
 
-## Utilizando o Soundex
+## Utilizando o *soundex*
 
 ```{r}
 banco1$primeiro_nome <- phonetic(banco1$primeiro_nome)
@@ -180,92 +202,172 @@ banco2$ultimo_nomemae <- phonetic(banco2$ultimo_nomemae)
 
 ## Biblioteca [reclin2](https://github.com/djvanderlaan/reclin2)
 
-```{r}
+```{r, message=FALSE, warning=FALSE, comments=NA, fig.height = 5, fig.width = 10, fig.align = "center"}
 library(reclin2)
 ```
 
-Em princípio, linkage consiste em comparar cada combinação de registos de dois conjuntos de dados e determinar quais dessas combinações (ou pares) pertencem à mesma entidade. No caso de uma chave de ligação perfeita, obviamente não é necessário comparar todas as combinações de registros, mas quando as chaves de ligação são imperfeitas e contêm erros, é em princípio necessário comparar todos os pares.
+<!-- Em princípio, linkage consiste em comparar cada combinação de registos de dois conjuntos de dados e determinar quais dessas combinações (ou pares) pertencem à mesma entidade. No caso de uma chave de ligação perfeita, obviamente não é necessário comparar todas as combinações de registros, mas quando as chaves de ligação são imperfeitas e contêm erros, é em princípio necessário comparar todos os pares. -->
 
-No entanto, comparar todos os pares pode resultar num número intratável de pares: ao ligar dois conjuntos de dados com um milhão de registos, existem 1012 pares possíveis. Portanto, geralmente é aplicado algum tipo de redução dos pares possíveis. 
+<!-- No entanto, comparar todos os pares pode resultar num número intratável de pares: ao ligar dois conjuntos de dados com um milhão de registos, existem 1012 pares possíveis. Portanto, geralmente é aplicado algum tipo de redução dos pares possíveis.  -->
 
-No exemplo abaixo aplicamos o bloco (ou bloqueio), o que significa que os pares só são gerados quando concordam com a variável de bloco (neste caso o usaremos o primeiro_nome, o último_nome e o primeiro_nomemae). Isso significa que pares de registros que discordam na variável de bloco não são considerados pares. Portanto, só serão utilizadas variáveis que possam ser consideradas sem erros como variáveis de bloco, ou vinculadas múltiplas vezes com diferentes variáveis de bloqueio e combinados os dois conjuntos de dados.
+<!-- No exemplo abaixo aplicamos o bloco (ou bloqueio), o que significa que os pares só são gerados quando concordam com a variável de bloco (neste caso o usaremos o primeiro_nome, o último_nome e o primeiro_nomemae). Isso significa que pares de registros que discordam na variável de bloco não são considerados pares. Portanto, só serão utilizadas variáveis que possam ser consideradas sem erros como variáveis de bloco, ou vinculadas múltiplas vezes com diferentes variáveis de bloqueio e combinados os dois conjuntos de dados. -->
 
-**Passo 1:** O primeiro passo na ligação (probabilística) é, portanto, gerar todos os pares.
+#### **Passo 1:** Gerar todos os possíveis pares utilizando os blocos: "primeiro_nome", "ultimo_nome", "primeiro_nomemae". É importante resaltar que os nomes separados já estão com o *soundex*.
 
 ```{r}
 pares <- pair_blocking(banco1, banco2, c("primeiro_nome", "ultimo_nome", "primeiro_nomemae"))
 datatable(pares, options = list(pageLength = 5))
 ```
 
-Como vocês podem ver, os registro 6 e 10 de x (o primeiro conjunto de dados) estão sendo comparados aos registros 8 e 9 de y, ou seja, abos com os mesmo primeiros e ultimos nomes.
+<p>- Como vocês podem ver, os registro 1 de x (banco1) estão sendo comparados ao registros 1 de y (banco2).</p>
 
-**Passo 2:** Comparação dos pares
+<p>- O registro 11 de x (o primeiro conjunto de dados) estão sendo comparados ao registros 8 de y (banco2).</p>
 
-```{r}
-pares <- compare_pairs(pares, on = c("nome", "nome_mae", "sexo", "dt_nasc"), default_comparator = cmp_jarowinkler(0.9), inplace = TRUE)
+<p>Os pares de registros devem ter o mesmo conteúdo das chaves de blocagem ("primeiro_nome", "ultimo_nome", "primeiro_nomemae").</p>
 
-datatable(pares, options = list(pageLength = 5))
-```
-
-Como podemos ver, não precisamos passar os conjuntos de dados originais, embora as variáveis nome, nome_mae, dt_nasc sejam desses conjuntos de dados originais. Isso ocorre porque uma cópia dos conjuntos de dados originais é armazenada com os pares de objetos (e você deve estar preocupado com a memória: desde que os conjuntos de dados originais não sejam modificados, os conjuntos de dados não são realmente copiados).
-
-A função de comparação padrão retorna TRUE quando as chaves de ligação concordam e false quando não concordam. No entanto, ao observar os conjuntos de dados originais, podemos ver que a maioria de nossas chaves de ligação são variáveis de string que contêm erros de digitação. A qualidade da nossa ligação poderia ser melhorada se pudéssemos usar uma pontuação de similaridade para comparar as duas cadeias: uma pontuação alta significa que as duas cadeias são muito semelhantes, um valor próximo de zero significa que as cadeias são muito diferentes.
-
-**Passo 3:** Escore dos pares
-
-A próxima etapa do processo é determinar quais pares de registros pertencem à mesma entidade e quais não. Existem inúmeras maneiras de fazer isso. Uma possibilidade é rotular alguns dos pares como correspondentes ou não e usar algum algoritmo de aprendizado de máquina para prever o status da correspondência usando os vetores de comparação.
-
-Tradicionalmente, é utilizado o quadro de ligação probabilística inicialmente formalizado por Fellegi e Sunter. A função $problink_{em}$ usa um algoritmo EM para estimar as chamadas probabilidades *m* e *u* para cada uma das variáveis de ligação. 
-
-A probabilidade *m* é a probabilidade de dois registros relativos à mesma entidade concordarem na variável de ligação; isso significa que a probabilidade *m* corresponde à probabilidade de haver erro nas variáveis de ligação. 
-
-A probabilidade *u* é a probabilidade de dois registros pertencentes a entidades diferentes concordarem em uma variável. Para uma variável com poucas categorias (como o sexo) esta probabilidade será grande, enquanto que para uma variável com um grande número de categorias (como o sobrenome) esta probabilidade será pequena.
+#### **Passo 2:** Comparação dos pares utilizando a métrica de similaridade *Jaro Winkler*
 
 ```{r}
-m <- problink_em(~ nome + nome_mae + sexo + dt_nasc, data = pares)
-print(m)
+tabela <- compare_pairs(pares, on = c("nome", "nome_mae", "dt_nasc"), default_comparator = cmp_jarowinkler(), inplace = TRUE)
+
+datatable(tabela, options = list(pageLength = 5))
 ```
-Essas probabilidades *m* e *u* podem ser usadas para pontuar os pares:
+ 
+<p>- O registro 1 de x (banco1) estão sendo comparados ao registros 1 de y (banco2), está com probalidae de similaridade de $0.9855$ no nome. Isso está acontecendo porque no banco 1 o nome = "Ana de Oliveira Rodrigues" e no banco2 o nome = "Anna de Oliveira Rodrigues", veja:</p>
+
+
+```{r, echo=FALSE}
+# Retirando a notação científica do R
+options(scipen = 999)
+
+# Adicionando mais colunas e dados
+dados <- data.frame(
+  banco = c("Probabilidades", "banco1", "banco2"),
+  id = c("-", "77", "78"),
+  nome = c("0.9855", "ANA OLIVEIRA RODRIGUES", "ANNA OLIVEIRA RODRIGUES"),
+  nome_mae = c("1", "MARIANA SANTOS SANTOS", "MARIANA SANTOS SANTOS"),
+  sexo = c("-", "F", "F"),
+  dt_nasc = c("1", "27/02/1973", "27/02/1973")
+)
+
+datatable(dados, 
+          options = list(
+            dom = 't',  # Desabilita todas as opções interativas
+            paging = FALSE,  # Desabilita paginação
+            searching = FALSE  # Desabilita a busca
+          ),
+          class = 'cell-border stripe',  # Classes adicionais para melhor aparência
+          callback = JS("$(table.table().container()).css('text-align', 'center');")) %>%
+  formatStyle(columns = names(dados), `text-align` = 'center')
+```
+
+<p>- O registro 27 de x (banco1) estão sendo comparados ao registros 20 de y (banco2), está com probabilidade de similaridade de $0.7695$ no nome, de $0.8639$ no nome_mae e de $0.8041$ na dt_nasc, veja:</p>
+
+
+```{r, echo=FALSE}
+# Adicionando mais colunas e dados
+dados <- data.frame(
+  banco = c("Probabilidades", "banco1", "banco2"),
+  id = c("-", "99", "94"),
+  nome = c("0.7695", "LUISA OLIVEIRA MARTINS", "LUISA SANTOS MARTINS"),
+  nome_mae = c("0.8639", "MARIANA COSTA PEREIRA", "MARIANA COSTA OLIVEIRA"),
+  sexo = c("-", "F", "F"),
+  dt_nasc = c("0.8041", "24/05/1982", "25/02/1998")
+)
+
+datatable(dados, 
+          options = list(
+            dom = 't',  # Desabilita todas as opções interativas
+            paging = FALSE,  # Desabilita paginação
+            searching = FALSE  # Desabilita a busca
+          ),
+          class = 'cell-border stripe',  # Classes adicionais para melhor aparência
+          callback = JS("$(table.table().container()).css('text-align', 'center');")) %>%
+  formatStyle(columns = names(dados), `text-align` = 'center')
+```
+
+<!-- Como podemos ver, não precisamos passar os conjuntos de dados originais, embora as variáveis nome, nome_mae, dt_nasc sejam desses conjuntos de dados originais. Isso ocorre porque uma cópia dos conjuntos de dados originais é armazenada com os pares de objetos (e você deve estar preocupado com a memória: desde que os conjuntos de dados originais não sejam modificados, os conjuntos de dados não são realmente copiados). -->
+
+<!-- A função de comparação padrão retorna TRUE quando as chaves de ligação concordam e false quando não concordam. No entanto, ao observar os conjuntos de dados originais, podemos ver que a maioria de nossas chaves de ligação são variáveis de string que contêm erros de digitação. A qualidade da nossa ligação poderia ser melhorada se pudéssemos usar uma pontuação de similaridade para comparar as duas cadeias: uma pontuação alta significa que as duas cadeias são muito semelhantes, um valor próximo de zero significa que as cadeias são muito diferentes. -->
+
+#### **Passo 3:** Identificando os pares - Modelo de Fellegi e Sunter
+
+<!-- A próxima etapa do processo é determinar quais pares de registros pertencem à mesma entidade e quais não. Existem inúmeras maneiras de fazer isso. Uma possibilidade é rotular alguns dos pares como correspondentes ou não e usar algum algoritmo de aprendizado de máquina para prever o status da correspondência usando os vetores de comparação. -->
+
+<!-- Tradicionalmente, é utilizado o quadro de ligação probabilística inicialmente formalizado por Fellegi e Sunter. A função $problink_{em}$ usa um algoritmo EM para estimar as chamadas probabilidades *m* e *u* para cada uma das variáveis de ligação. -->
+
+<!-- A probabilidade *m* é a probabilidade de dois registros relativos à mesma entidade concordarem na variável de ligação; isso significa que a probabilidade *m* corresponde à probabilidade de haver erro nas variáveis de ligação. -->
+
+<!-- A probabilidade *u* é a probabilidade de dois registros pertencentes a entidades diferentes concordarem em uma variável. Para uma variável com poucas categorias (como o sexo) esta probabilidade será grande, enquanto que para uma variável com um grande número de categorias (como o sobrenome) esta probabilidade será pequena. -->
+
+
+<!-- ```{r} -->
+<!-- m <- problink_em(~ nome + nome_mae + sexo + dt_nasc, data = pares) -->
+<!-- pares <- predict(m, pairs = pares, add = TRUE) -->
+<!-- print(pares) -->
+<!-- ``` -->
+
+<!-- Essas probabilidades *m* e *u* podem ser usadas para pontuar os pares: -->
+
+<!-- ```{r} -->
+<!-- pares <- predict(m, pairs = pares, add = TRUE) -->
+<!-- print(pares) -->
+<!-- ``` -->
+
+<!-- Um método mais simples é basear a pontuação diretamente nas pontuações de similaridade, calculando uma soma (ponderada) das pontuações de similaridade. Quanto maior a pontuação, mais semelhantes são os dois registros do par. No caso mais simples, score_simple apenas calcula a soma das pontuações de similaridade das variáveis comparadas: -->
+
+
+<!-- ```{r} -->
+<!-- pares <- score_simple(pares, "score",  on = c("nome", "nome_mae", "sexo")) -->
+<!-- pares -->
+<!-- ``` -->
+
+<!-- #### **Passo 4:** Selecionando os pares -->
+
+<!-- A etapa final é selecionar os pares que são considerados pertencentes às mesmas entidades. O método mais simples é selecionar todos os pares acima de um determinado limite -->
+
+```{r, message=FALSE, warning=FALSE, comments=NA, fig.height = 5, fig.width = 10, fig.align = "center"}
+# Modelo de Fellegi e Sunter (probabilidade M e U)
+m <- problink_em(~ nome + nome_mae + dt_nasc, data = tabela)
+m
+```
+
+```{r, message=FALSE, warning=FALSE, comments=NA, fig.height = 5, fig.width = 10, fig.align = "center"}
+# Calculando os pesos (weights) em função das probabilidades M e U
+tabela2 <- predict(m, pairs = tabela, add = TRUE)
+
+# Escolhendo o ponto de corte (threshold > 20) em função dos pesos (weights) 
+tabela3 <- select_threshold(tabela2, "threshold", score = "weights", threshold = 20)
+
+tabela3
+```
+
+<!-- As funções selecionadas adicionam uma variável (lógica) ao conjunto de dados indicando se um par está selecionado ou não. -->
+
+<!-- Neste caso sabemos quais registros realmente pertencem um ao outro. Podemos usar isso para avaliar a ligação: -->
+
+<!-- ```{r} -->
+<!-- pares <- compare_vars(pares, "truth", on_x = "id", on_y = "id") -->
+<!-- print(pares) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- table(pares$truth, pares$threshold) -->
+<!-- ``` -->
+
+#### **Passo Final:** Tabelas com os pares.
+
+<!-- A verdadeira etapa final é criar o conjunto de dados consolidado. Agora sabemos quais pares serão consolidados, mas ainda precisamos vinculá-los. A função *link* faz isso (os argumentos opcionais *all_x* e *all_y* controlam o tipo de ligação): -->
 
 ```{r}
-pares <- predict(m, pairs = pares, add = TRUE)
-print(pares)
+# Obtendo os pares
+linked_data_set <- link(tabela3)
+
+# Selecionando e arrumando as variáveis com dos pares na tabela
+linked_data_set <- linked_data_set |>
+                    select(id.x, id.y, nome.x, nome.y, nome_mae.x, nome_mae.y, 
+                           sexo.x, sexo.y, dt_nasc.x, dt_nasc.y)
+
+# Gerando a tabela com os pares
+datatable(linked_data_set, options = list(pageLength = 7))
 ```
-
-Um método mais simples é basear a pontuação diretamente nas pontuações de similaridade, calculando uma soma (ponderada) das pontuações de similaridade. Quanto maior a pontuação, mais semelhantes são os dois registros do par. No caso mais simples, score_simple apenas calcula a soma das pontuações de similaridade das variáveis comparadas:
-
-```{r}
-pares <- score_simple(pares, "score",  on = c("nome", "nome_mae", "sexo"))
-pares
-```
-**Passo 4:** Selecionando os pares
-
-A etapa final é selecionar os pares que são considerados pertencentes às mesmas entidades. O método mais simples é selecionar todos os pares acima de um determinado limite
-
-```{r}
-pares <- select_threshold(pares, "threshold", score = "weights", threshold = 9)
-print(pares)
-```
-
-As funções selecionadas adicionam uma variável (lógica) ao conjunto de dados indicando se um par está selecionado ou não.
-
-Neste caso sabemos quais registros realmente pertencem um ao outro. Podemos usar isso para avaliar a ligação:
-
-```{r}
-pares <- compare_vars(pares, "truth", on_x = "id", on_y = "id")
-print(pares)
-```
-
-```{r}
-table(pares$truth, pares$threshold)
-```
-
-**Passo Final:** Último Passo !!!!!
-
-A verdadeira etapa final é criar o conjunto de dados consolidado. Agora sabemos quais pares serão consolidados, mas ainda precisamos vinculá-los. A função *link* faz isso (os argumentos opcionais *all_x* e *all_y* controlam o tipo de ligação):
-
-```{r}
-linked_data_set <- link(pares)
-datatable(linked_data_set, options = list(pageLength = 15))
-```
-

@@ -8,7 +8,7 @@
 
 <meta name="author" content="Wagner Tassinari">
 
-<title>Record Linkage</title>
+<title>Exercício Record Linkage</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -5015,6 +5015,9 @@ HTMLWidgets.widget({
         updateColsSelected();
         updateCellsSelected();
       })
+      updateRowsSelected();
+      updateColsSelected();
+      updateCellsSelected();
     }
 
     var selMode = data.selection.mode, selTarget = data.selection.target;
@@ -5695,22 +5698,27 @@ window.Quarto = {
     <h2 id="toc-title">Tópicos</h2>
    
   <ul>
-  <li><a href="#preparação-dos-bancos" id="toc-preparação-dos-bancos" class="nav-link active" data-scroll-target="#preparação-dos-bancos">Preparação dos Bancos</a>
+  <li><a href="#preparação-das-bases-de-dados" id="toc-preparação-das-bases-de-dados" class="nav-link active" data-scroll-target="#preparação-das-bases-de-dados">Preparação das Bases de Dados</a>
   <ul class="collapse">
   <li><a href="#bibliotecas" id="toc-bibliotecas" class="nav-link" data-scroll-target="#bibliotecas">Bibliotecas</a></li>
   <li><a href="#função-de-limpeza" id="toc-função-de-limpeza" class="nav-link" data-scroll-target="#função-de-limpeza">Função de Limpeza</a></li>
   <li><a href="#lendo-os-bancos" id="toc-lendo-os-bancos" class="nav-link" data-scroll-target="#lendo-os-bancos">Lendo os bancos</a></li>
+  </ul></li>
+  <li><a href="#limpeza-e-padronização-dos-dados" id="toc-limpeza-e-padronização-dos-dados" class="nav-link" data-scroll-target="#limpeza-e-padronização-dos-dados">Limpeza e padronização dos dados</a>
+  <ul class="collapse">
   <li><a href="#rodando-a-função-limpeza" id="toc-rodando-a-função-limpeza" class="nav-link" data-scroll-target="#rodando-a-função-limpeza">Rodando a Função Limpeza</a></li>
+  <li><a href="#transformando-as-datas-para-o-formato-character" id="toc-transformando-as-datas-para-o-formato-character" class="nav-link" data-scroll-target="#transformando-as-datas-para-o-formato-character">Transformando as datas para o formato <em>character</em></a></li>
+  <li><a href="#removendo-os-registros-duplicados" id="toc-removendo-os-registros-duplicados" class="nav-link" data-scroll-target="#removendo-os-registros-duplicados">Removendo os registros duplicados</a></li>
   </ul></li>
   <li><a href="#linkage-determinístico" id="toc-linkage-determinístico" class="nav-link" data-scroll-target="#linkage-determinístico">Linkage Determinístico</a>
   <ul class="collapse">
-  <li><a href="#utilizando-uma-chave-primária-original" id="toc-utilizando-uma-chave-primária-original" class="nav-link" data-scroll-target="#utilizando-uma-chave-primária-original">Utilizando uma chave primária original</a></li>
-  <li><a href="#utilizando-uma-chave-slk" id="toc-utilizando-uma-chave-slk" class="nav-link" data-scroll-target="#utilizando-uma-chave-slk">Utilizando uma chave SLK</a></li>
+  <li><a href="#opção-1-utilizando-uma-chave-primária-original" id="toc-opção-1-utilizando-uma-chave-primária-original" class="nav-link" data-scroll-target="#opção-1-utilizando-uma-chave-primária-original"><strong>Opção 1:</strong> Utilizando uma chave primária original</a></li>
+  <li><a href="#opção-2-utilizando-uma-chave-slk" id="toc-opção-2-utilizando-uma-chave-slk" class="nav-link" data-scroll-target="#opção-2-utilizando-uma-chave-slk"><strong>Opção 2:</strong> Utilizando uma chave SLK</a></li>
   </ul></li>
   <li><a href="#linkage-probabilístico" id="toc-linkage-probabilístico" class="nav-link" data-scroll-target="#linkage-probabilístico">Linkage Probabilístico</a>
   <ul class="collapse">
-  <li><a href="#preparando-as-variáveis" id="toc-preparando-as-variáveis" class="nav-link" data-scroll-target="#preparando-as-variáveis">Preparando as variáveis</a></li>
-  <li><a href="#utilizando-o-soundex" id="toc-utilizando-o-soundex" class="nav-link" data-scroll-target="#utilizando-o-soundex">Utilizando o Soundex</a></li>
+  <li><a href="#separando-os-nomes" id="toc-separando-os-nomes" class="nav-link" data-scroll-target="#separando-os-nomes">Separando os nomes</a></li>
+  <li><a href="#utilizando-o-soundex" id="toc-utilizando-o-soundex" class="nav-link" data-scroll-target="#utilizando-o-soundex">Utilizando o <em>soundex</em></a></li>
   <li><a href="#biblioteca-reclin2" id="toc-biblioteca-reclin2" class="nav-link" data-scroll-target="#biblioteca-reclin2">Biblioteca reclin2</a></li>
   </ul></li>
   </ul>
@@ -5720,7 +5728,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Record Linkage</h1>
+<h1 class="title">Exercício Record Linkage</h1>
 </div>
 
 
@@ -5737,7 +5745,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Data de Publicação</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">3 de janeiro de 2025</p>
+      <p class="date">28 de maio de 2023</p>
     </div>
   </div>
   
@@ -5752,14 +5760,16 @@ window.Quarto = {
 <!-- # Customizar o cabeçalho (dependendo da sua ferramenta) -->
 <!-- # header-includes: -->
 <!-- # Se estiver usando LaTeX através do Pandoc -->
-<section id="preparação-dos-bancos" class="level1">
-<h1>Preparação dos Bancos</h1>
+<section id="preparação-das-bases-de-dados" class="level1">
+<h1>Preparação das Bases de Dados</h1>
 <section id="bibliotecas" class="level2">
 <h2 class="anchored" data-anchor-id="bibliotecas">Bibliotecas</h2>
-<div class="cell">
+<div class="cell" data-layout-align="center" data-comments="null">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Carregando as bibliotecas necessárias</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, lubridate, readr, reclin2,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               stringi, lubridate, tidyr, digest, DT, stringdist)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(digest)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringdist)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="função-de-limpeza" class="level2">
@@ -5795,8 +5805,8 @@ window.Quarto = {
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>banco1 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;banco1.csv&quot;</span>) </span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(banco1, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">5</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-bfabf6089e7e1675a789" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-bfabf6089e7e1675a789">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42"],[77,29,17,101,76,48,9,23,39,43,20,31,95,37,1,97,24,10,87,12,54,34,83,40,63,82,99,55,81,53,92,75,98,26,36,67,2,68,62,80,6,4],["Ana de Oliveira Rodrigues","Ana dos Santos dos Santos","Ana dos Santos Pereira","Hana Martins da Costa","Carlos da Costa e Silva","Carlos da Costa Martins","Carlos de Oliveira da Costa","Karla de Oliveira Silva","Carlos de Oliveira Pereira","Carlos dos Santos ","Carlos e Silva da Costa","Carlos e Silva Martins","Carlos Martins da Costa","João de Oliveira de Oliveira","João de Oliveira Rodrigues","João dos Santos da Costa","João e Silva e Silva","João e Silva Pereira","João Pereira dos Santos","João Pereira e Silva","José dos Santos Pereira","José e Silva de Oliveira","José e Silva dos Santos","José Martins Rodrigues","José Pereira dos Santos","Leandra da Costa","Luísa de Oliveira Martins","Luísa e Silva da Costa","Luísa e Silva Pereira","Luísa Martins da Costa","Maria da Costa e Silva","Maria dos Santos da Costa","Maria dos Santos de Oliveira","Maria dos Santos Martins","Mariana e Silva dos Santos","Mariana e Silva Pereira","Mariana Rodrigues Rodrigues","Pedro da Costa Oliveira","Pedro dos Santos dos Santos","Pedro e Silva Martins","Pedro Rodrigues de Oliveira","Pedro Rodrigues e Silva"],["Mariana dos Santos dos Santos","João da Costa da Costa","José da Costa de Oliveira","Luísa dos Santos Martins","Mariana Pereira Martins","Luísa da Costa Pereira","Pedro de Oliveira dos Santos","Maria da Costa da Costa","Carlos Pereira Martins","Josefa de Oliveira Rodrigues","Ana Martins Pereira","Carlos de Oliveira Martins","Antônia de Oliveira dos Santos","Pedro dos Santos Rodrigues","João de Oliveira e Silva","Maria da Costa Martins","Ana Rodrigues da Costa","Pedro Martins de Oliveira","Joana de Oliveira e Silva","Mariana Pereira e Silva","Mariana da Costa Martins","Mariana e Silva e Silva","Luiza Silva dos Santos","Luísa de Oliveira e Silva","Mariana dos Santos Pereira","Maria de Lourdes dos Santos","Mariana da Costa Pereira","Maria e Silva Martins","Maria de Oliveira","Pedro de Oliveira e Silva","Mariana Martins Rodrigues","Maria dos Santos Martins","João da Costa da Costa","João e Silva Pereira","Maria Rodrigues Rodrigues","João Rodrigues Pereira","João de Oliveira Rodrigues","Maria dos Santos Pereira","Luísa dos Santos de Oliveira","Ana Martins dos Santos","Carlos Rodrigues de Oliveira","Karla da Costa "],["F","F","F","F","M","M","M","F","M","M","M","M","M","M","M","M","","M","M","F","","M","M","M","M","F","F","F","F","F","F","F","F","F","F","M","F","M","M","M","M","M"],["27/02/1973","01/04/1972","05/05/1995","28/07/1976","14/03/1998","03/02/1972","14/03/1992","02/01/1982","17/10/1976","11/06/1973","09/06/1975","11/04/1986","28/06/1975","21/11/1980","15/12/1990","15/06/1974","19/08/1979","27/01/1983","16/08/1986","03/02/2001","19/11/1981","11/06/2001","03/08/1985","13/04/1998","20/04/1994","25/07/1989","24/05/1982","27/04/1976","23/12/1976","12/02/1999","15/09/1999","27/11/1993","03/10/1998","01/05/1991","14/02/2002","08/11/1987","01/06/2002","26/03/1973","14/08/1975","04/05/1991","03/16/1996","16/03/1996"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>id<\/th>\n      <th>nome<\/th>\n      <th>nome_mae<\/th>\n      <th>sexo<\/th>\n      <th>dt_nasc<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":1},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"id","targets":1},{"name":"nome","targets":2},{"name":"nome_mae","targets":3},{"name":"sexo","targets":4},{"name":"dt_nasc","targets":5}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-781f85c708256e8f0934" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-781f85c708256e8f0934">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42"],[77,29,17,101,76,48,9,23,39,43,20,31,95,37,1,97,24,10,87,12,54,34,83,40,63,82,99,55,81,53,92,75,98,26,36,67,2,68,62,80,6,4],["Ana de Oliveira Rodrigues","Ana dos Santos dos Santos","Ana dos Santos Pereira","Hana Martins da Costa","Carlos da Costa e Silva","Carlos da Costa Martins","Carlos de Oliveira da Costa","Karla de Oliveira Silva","Carlos de Oliveira Pereira","Carlos dos Santos ","Carlos e Silva da Costa","Carlos e Silva Martins","Carlos Martins da Costa","João de Oliveira de Oliveira","João de Oliveira Rodrigues","João dos Santos da Costa","João e Silva e Silva","João e Silva Pereira","João Pereira dos Santos","João Pereira e Silva","José dos Santos Pereira","José e Silva de Oliveira","José e Silva dos Santos","José Martins Rodrigues","José Pereira dos Santos","Leandra da Costa","Luísa de Oliveira Martins","Luísa e Silva da Costa","Luísa e Silva Pereira","Luísa Martins da Costa","Maria da Costa e Silva","Maria dos Santos da Costa","Maria dos Santos de Oliveira","Maria dos Santos Martins","Mariana e Silva dos Santos","Mariana e Silva Pereira","Mariana Rodrigues Rodrigues","Pedro da Costa Oliveira","Pedro dos Santos dos Santos","Pedro e Silva Martins","Pedro Rodrigues de Oliveira","Pedro Rodrigues e Silva"],["Mariana dos Santos dos Santos","João da Costa da Costa","José da Costa de Oliveira","Luísa dos Santos Martins","Mariana Pereira Martins","Luísa da Costa Pereira","Pedro de Oliveira dos Santos","Maria da Costa da Costa","Carlos Pereira Martins","Josefa de Oliveira Rodrigues","Ana Martins Pereira","Carlos de Oliveira Martins","Antônia de Oliveira dos Santos","Pedro dos Santos Rodrigues","João de Oliveira e Silva","Maria da Costa Martins","Ana Rodrigues da Costa","Pedro Martins de Oliveira","Joana de Oliveira e Silva","Mariana Pereira e Silva","Mariana da Costa Martins","Mariana e Silva e Silva","Luiza Silva dos Santos","Luísa de Oliveira e Silva","Mariana dos Santos Pereira","Maria de Lourdes dos Santos","Mariana da Costa Pereira","Maria e Silva Martins","Maria de Oliveira","Abrão de Souza Jr","Mariana Martins Rodrigues","Maria dos Santos Martins","João da Costa da Costa","João e Silva Pereira","Maria Rodrigues Rodrigues","João Rodrigues Pereira","João de Oliveira Rodrigues","Maria dos Santos Pereira","Luísa dos Santos de Oliveira","Ana Martins dos Santos","Carlos Rodrigues de Oliveira","Karla da Costa "],["F","F","F","F","M","M","M","F","M","M","M","M","M","M","M","M","","M","M","F","","M","M","M","M","F","F","F","F","F","F","F","F","F","F","M","F","M","M","M","M","M"],["27/02/1973","01/04/1972","05/05/1995","28/07/1976","14/03/1998","03/02/1972","14/03/1992","02/01/1982","17/10/1976","11/06/1973","09/06/1975","11/04/1986","28/06/1975","21/11/1980","15/12/1990","15/06/1974","19/08/1979","27/01/1983","16/08/1986","03/02/2001","19/11/1981","11/06/2001","03/08/1985","13/04/1998","20/04/1994","25/07/1989","24/05/1982","27/04/1976","23/12/1976","12/02/1999","15/09/1999","27/11/1993","03/10/1998","01/05/1991","14/02/2002","08/11/1987","01/06/2002","26/03/1973","14/08/1975","04/05/1991","03/16/1996","16/03/1996"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>id<\/th>\n      <th>nome<\/th>\n      <th>nome_mae<\/th>\n      <th>sexo<\/th>\n      <th>dt_nasc<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":1},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"id","targets":1},{"name":"nome","targets":2},{"name":"nome_mae","targets":3},{"name":"sexo","targets":4},{"name":"dt_nasc","targets":5}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <div class="cell">
@@ -5804,11 +5814,14 @@ window.Quarto = {
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>banco2 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;banco2.csv&quot;</span>) </span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(banco2, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">5</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-7c3c5e2c07656cd08640" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-7c3c5e2c07656cd08640">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34"],[78,38,16,15,76,48,39,20,32,37,19,44,87,84,54,83,63,72,7,94,55,85,8,98,74,100,41,66,67,53,46,27,80,6],["Anna de Oliveira Rodrigues","Anna dos Santos Pereira","Anna Martins da Costaa","Anna Rodriguez Pereira","Carlos da Costa e Silva","Carlos da Costa Martins","Carlos de Oliveira Pereira","Carlos e Silva da Costa","Carlos Martins da Costa","João de Oliveira de Oliveira","João dos Santos Rodrigues","João e Silva Martins","João Pereira dos Santos","João Pereira Martins","José dos Santos Pereira","José e Silva dos Santos","José Pereira dos Santos","José Pereira Pereira","Luísa de Oliveira Rodrigues","Luísa dos Santos Martins","Luísa e Silva da Costa","Luísa e Silva Pereira","Luíza e Silva Rodrigues","Maria dos Santos de Oliveira","Maria e Silva da Costa","Maria Martins Martins","Maria Martins Rodrigues","Mariana dos Santos Rodrigues","Marianna da Silva Pereira","Marianna Santos Rodriguez","Pedro da Costa Oliveira","Pedro dos Santos da Costa","Pedro e Silva Martins","Pedro Rodrigues e Silva"],["Mariana dos Santos dos Santos","Pedro e Silva de Oliveira","Luísa dos Santos Martins","Maria e Silva Pereira","Mariana Pereira Martins","Luísa da Costa Pereira","Laila Pereira Martins","Ana Martins Pereira","Antônia de Oliveira dos Santos","Sheila dos Santos Rodrigues","Ana e Silva Pereira","Ana de Oliveira dos Santos","Joana de Oliveira e Silva","Ana da Costa dos Santos","Mariana da Costa Martins","José e Silva dos Santos","Mariana dos Santos Pereira","Ana Rodrigues da Costa","Maria da Silva","Mariana da Costa de Oliveira","Maria da Silva Martins","José dos Santos e Silva","Maria dos Santos de Oliveira","João da Costa da Costa","Pedro da Costa da Costa","Mariana de Oliveira Rodrigues","Mariana Martins Pereira","Mariana da Costa da Costa","João Rodrigues Pereira","Pedro de Oliveira e Silva","Maria dos Santos Pereira","Mariana e Silva Pereira","Ana Martins dos Santos","Carla da Costa "],["F","","F","F","M","M","F","M","M","M","","M","M","","M","F","M","F","M","F","F","F","F","F","F","M","","F","F","F","M","M","M","M"],["27/02/1973","16/08/1988","28/07/1976","26/01/1982","14/03/1998","03/02/1972","17/10/1976","09/06/1975","28/06/1975","21/11/1980","16/10/2000","21/11/1981","15/08/1986","03/01/1970","19/11/1981","03/08/1985","20/04/1994","23/06/1984","05/10/1999","25/02/1998","27/04/1976","04/01/1995","11/02/1996","03/10/1998","15/12/1983","01/01/1977","21/08/1994","04/05/1988","08/11/1987","12/02/1999","26/03/1973","27/03/1982","04/05/1991","16/03/1996"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>id<\/th>\n      <th>nome<\/th>\n      <th>nome_mae<\/th>\n      <th>sexo<\/th>\n      <th>dt_nasc<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":1},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"id","targets":1},{"name":"nome","targets":2},{"name":"nome_mae","targets":3},{"name":"sexo","targets":4},{"name":"dt_nasc","targets":5}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-6979d8a918f832a1ca93" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-6979d8a918f832a1ca93">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34"],[78,38,16,15,76,48,39,20,32,37,19,44,87,84,54,83,63,72,7,94,55,85,8,98,74,100,41,66,67,53,46,27,80,6],["Anna de Oliveira Rodrigues","Anna dos Santos Pereira","Anna Martins da Costaa","Anna Rodriguez Pereira","Carlos da Costa e Silva","Carlos da Costa Martins","Carlos de Oliveira Pereira","Carlos e Silva da Costa","Carlos Martins da Costa","João de Oliveira de Oliveira","João dos Santos Rodrigues","João e Silva Martins","João Pereira dos Santos","João Pereira Martins","José dos Santos Pereira","José e Silva dos Santos","José Pereira dos Santos","José Pereira Pereira","Luísa de Oliveira Rodrigues","Luísa dos Santos Martins","Luísa e Silva da Costa","Luísa e Silva Pereira","Luíza e Silva Rodrigues","Maria dos Santos de Oliveira","Maria e Silva da Costa","Maria Martins Martins","Maria Martins Rodrigues","Mariana dos Santos Rodrigues","Marianna da Silva Pereira","Marianna Santos Rodriguez","Pedro da Costa Oliveira","Pedro dos Santos da Costa","Pedro e Silva Martins","Pedro Rodrigues e Silva"],["Mariana dos Santos dos Santos","Pedro e Silva de Oliveira","Luísa dos Santos Martins","Maria e Silva Pereira","Marianna Pereira Martins","Luíza da Costa Pereira","Laila Pereira Martins","Ana Martins Pereira","Antônia de Oliveira dos Santos","Sheila dos Santos Rodrigues","Ana e Silva Pereira","Ana de Oliveira dos Santos","Joana de Oliveira e Silva","Anna da Costa dos Santos","Marianna da Costa Martins","José e Silva dos Santos","Mariana dos Santos Pereira","Ana Rodrigues da Costa","Maria da Silva","Marianna da Costa de Oliveira","Maria da Silva Martins","José dos Santos e Silva","Maria dos Santos de Oliveira","Joã da Costa da Costa","Pedro da Costa da Costa","Marianna de Oliveira Rodrigues","Mariana Martins Pereira","Marianna da Costa da Costa","Joã Rodrigues Pereira","Pedro de Oliveira e Silva","Maria dos Santos Pereira","Marianna e Silva Pereira","Ana Martins dos Santos","Carla da Costa "],["F","","F","F","M","M","F","M","M","M","","M","M","","M","F","M","F","M","F","F","F","F","F","F","M","","F","F","F","M","M","M","M"],["27/02/1973","16/08/1988","28/07/1976","26/01/1982","14/03/1998","03/02/1972","17/10/1976","09/06/1975","28/06/1975","21/11/1980","16/10/2000","21/11/1981","15/08/1986","03/01/1970","19/11/1981","03/08/1985","20/04/1994","23/06/1984","05/10/1999","25/02/1998","27/04/1976","04/01/1995","11/02/1996","03/10/1998","15/12/1983","01/01/1977","21/08/1994","04/05/1988","08/11/1987","12/02/1999","26/03/1973","27/03/1982","04/05/1991","16/03/1996"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>id<\/th>\n      <th>nome<\/th>\n      <th>nome_mae<\/th>\n      <th>sexo<\/th>\n      <th>dt_nasc<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":1},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"id","targets":1},{"name":"nome","targets":2},{"name":"nome_mae","targets":3},{"name":"sexo","targets":4},{"name":"dt_nasc","targets":5}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
+</section>
+<section id="limpeza-e-padronização-dos-dados" class="level1">
+<h1>Limpeza e padronização dos dados</h1>
 <section id="rodando-a-função-limpeza" class="level2">
 <h2 class="anchored" data-anchor-id="rodando-a-função-limpeza">Rodando a Função Limpeza</h2>
 <div class="cell">
@@ -5816,339 +5829,318 @@ window.Quarto = {
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>nome <span class="ot">&lt;-</span> <span class="fu">limpa_str</span>(banco2<span class="sc">$</span>nome)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>nome_mae <span class="ot">&lt;-</span> <span class="fu">limpa_str</span>(banco1<span class="sc">$</span>nome_mae)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>nome_mae <span class="ot">&lt;-</span> <span class="fu">limpa_str</span>(banco2<span class="sc">$</span>nome_mae)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>dt_nasc <span class="ot">&lt;-</span> <span class="fu">as.character</span>(banco1<span class="sc">$</span>dt_nasc)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>dt_nasc <span class="ot">&lt;-</span> <span class="fu">as.character</span>(banco2<span class="sc">$</span>dt_nasc)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Remover registros duplicados em cada banco de dados</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>banco1 <span class="ot">&lt;-</span> <span class="fu">distinct</span>(banco1)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>banco2 <span class="ot">&lt;-</span> <span class="fu">distinct</span>(banco2)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>nome_mae <span class="ot">&lt;-</span> <span class="fu">limpa_str</span>(banco2<span class="sc">$</span>nome_mae)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="transformando-as-datas-para-o-formato-character" class="level2">
+<h2 class="anchored" data-anchor-id="transformando-as-datas-para-o-formato-character">Transformando as datas para o formato <em>character</em></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>dt_nasc <span class="ot">&lt;-</span> <span class="fu">as.character</span>(banco1<span class="sc">$</span>dt_nasc)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>dt_nasc <span class="ot">&lt;-</span> <span class="fu">as.character</span>(banco2<span class="sc">$</span>dt_nasc)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="removendo-os-registros-duplicados" class="level2">
+<h2 class="anchored" data-anchor-id="removendo-os-registros-duplicados">Removendo os registros duplicados</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>banco1 <span class="ot">&lt;-</span> <span class="fu">distinct</span>(banco1)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>banco2 <span class="ot">&lt;-</span> <span class="fu">distinct</span>(banco2)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
 <section id="linkage-determinístico" class="level1">
 <h1>Linkage Determinístico</h1>
-<section id="utilizando-uma-chave-primária-original" class="level2">
-<h2 class="anchored" data-anchor-id="utilizando-uma-chave-primária-original">Utilizando uma chave primária original</h2>
+<section id="opção-1-utilizando-uma-chave-primária-original" class="level2">
+<h2 class="anchored" data-anchor-id="opção-1-utilizando-uma-chave-primária-original"><strong>Opção 1:</strong> Utilizando uma chave primária original</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Vinculando as bases utilizando o id</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>bancos_unidos1 <span class="ot">&lt;-</span> <span class="fu">merge</span>(banco1, banco2, <span class="at">by =</span> <span class="st">&quot;id&quot;</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(bancos_unidos1)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Vinculando as bases utilizando o id</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>bancos_unidos1 <span class="ot">&lt;-</span> <span class="fu">merge</span>(banco1, banco2, <span class="at">by =</span> <span class="st">&quot;id&quot;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(bancos_unidos1)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 15  9</code></pre>
 </div>
 </div>
 <p>Foram encontrados 15 registros comuns entre os bancos.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(bancos_unidos1, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">5</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(bancos_unidos1, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">5</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-ed6f8823fdfce3efa299" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-ed6f8823fdfce3efa299">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"],[6,20,37,39,48,53,54,55,63,67,76,80,83,87,98],["PEDRO RODRIGUES OLIVEIRA","CARLOS SILVA COSTA","JOAO OLIVEIRA OLIVEIRA","CARLOS OLIVEIRA PEREIRA","CARLOS COSTA MARTINS","LUISA MARTINS COSTA","JOSE SANTOS PEREIRA","LUISA SILVA COSTA","JOSE PEREIRA SANTOS","MARIANA SILVA PEREIRA","CARLOS COSTA SILVA","PEDRO SILVA MARTINS","JOSE SILVA SANTOS","JOAO PEREIRA SANTOS","MARIA SANTOS OLIVEIRA"],["CARLOS RODRIGUES OLIVEIRA","ANA MARTINS PEREIRA","PEDRO SANTOS RODRIGUES","CARLOS PEREIRA MARTINS","LUISA COSTA PEREIRA","PEDRO OLIVEIRA SILVA","MARIANA COSTA MARTINS","MARIA SILVA MARTINS","MARIANA SANTOS PEREIRA","JOAO RODRIGUES PEREIRA","MARIANA PEREIRA MARTINS","ANA MARTINS SANTOS","LUIZA SILVA SANTOS","JOANA OLIVEIRA SILVA","JOAO COSTA COSTA"],["M","M","M","M","M","F","","F","M","M","M","M","M","M","F"],["03/16/1996","09/06/1975","21/11/1980","17/10/1976","03/02/1972","12/02/1999","19/11/1981","27/04/1976","20/04/1994","08/11/1987","14/03/1998","04/05/1991","03/08/1985","16/08/1986","03/10/1998"],["PEDRO RODRIGUES SILVA","CARLOS SILVA COSTA","JOAO OLIVEIRA OLIVEIRA","CARLOS OLIVEIRA PEREIRA","CARLOS COSTA MARTINS","MARIANNA SANTOS RODRIGUEZ","JOSE SANTOS PEREIRA","LUISA SILVA COSTA","JOSE PEREIRA SANTOS","MARIANNA SILVA PEREIRA","CARLOS COSTA SILVA","PEDRO SILVA MARTINS","JOSE SILVA SANTOS","JOAO PEREIRA SANTOS","MARIA SANTOS OLIVEIRA"],["CARLA COSTA","ANA MARTINS PEREIRA","SHEILA SANTOS RODRIGUES","LAILA PEREIRA MARTINS","LUISA COSTA PEREIRA","PEDRO OLIVEIRA SILVA","MARIANA COSTA MARTINS","MARIA SILVA MARTINS","MARIANA SANTOS PEREIRA","JOAO RODRIGUES PEREIRA","MARIANA PEREIRA MARTINS","ANA MARTINS SANTOS","JOSE SILVA SANTOS","JOANA OLIVEIRA SILVA","JOAO COSTA COSTA"],["M","M","M","F","M","F","M","F","M","F","M","M","F","M","F"],["16/03/1996","09/06/1975","21/11/1980","17/10/1976","03/02/1972","12/02/1999","19/11/1981","27/04/1976","20/04/1994","08/11/1987","14/03/1998","04/05/1991","03/08/1985","15/08/1986","03/10/1998"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>id<\/th>\n      <th>nome.x<\/th>\n      <th>nome_mae.x<\/th>\n      <th>sexo.x<\/th>\n      <th>dt_nasc.x<\/th>\n      <th>nome.y<\/th>\n      <th>nome_mae.y<\/th>\n      <th>sexo.y<\/th>\n      <th>dt_nasc.y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":1},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"id","targets":1},{"name":"nome.x","targets":2},{"name":"nome_mae.x","targets":3},{"name":"sexo.x","targets":4},{"name":"dt_nasc.x","targets":5},{"name":"nome.y","targets":6},{"name":"nome_mae.y","targets":7},{"name":"sexo.y","targets":8},{"name":"dt_nasc.y","targets":9}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-c6dbd67ffe438db5e4ab" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-c6dbd67ffe438db5e4ab">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"],[6,20,37,39,48,53,54,55,63,67,76,80,83,87,98],["PEDRO RODRIGUES OLIVEIRA","CARLOS SILVA COSTA","JOAO OLIVEIRA OLIVEIRA","CARLOS OLIVEIRA PEREIRA","CARLOS COSTA MARTINS","LUISA MARTINS COSTA","JOSE SANTOS PEREIRA","LUISA SILVA COSTA","JOSE PEREIRA SANTOS","MARIANA SILVA PEREIRA","CARLOS COSTA SILVA","PEDRO SILVA MARTINS","JOSE SILVA SANTOS","JOAO PEREIRA SANTOS","MARIA SANTOS OLIVEIRA"],["CARLOS RODRIGUES OLIVEIRA","ANA MARTINS PEREIRA","PEDRO SANTOS RODRIGUES","CARLOS PEREIRA MARTINS","LUISA COSTA PEREIRA","ABRAO SOUZA JR","MARIANA COSTA MARTINS","MARIA SILVA MARTINS","MARIANA SANTOS PEREIRA","JOAO RODRIGUES PEREIRA","MARIANA PEREIRA MARTINS","ANA MARTINS SANTOS","LUIZA SILVA SANTOS","JOANA OLIVEIRA SILVA","JOAO COSTA COSTA"],["M","M","M","M","M","F","","F","M","M","M","M","M","M","F"],["03/16/1996","09/06/1975","21/11/1980","17/10/1976","03/02/1972","12/02/1999","19/11/1981","27/04/1976","20/04/1994","08/11/1987","14/03/1998","04/05/1991","03/08/1985","16/08/1986","03/10/1998"],["PEDRO RODRIGUES SILVA","CARLOS SILVA COSTA","JOAO OLIVEIRA OLIVEIRA","CARLOS OLIVEIRA PEREIRA","CARLOS COSTA MARTINS","MARIANNA SANTOS RODRIGUEZ","JOSE SANTOS PEREIRA","LUISA SILVA COSTA","JOSE PEREIRA SANTOS","MARIANNA SILVA PEREIRA","CARLOS COSTA SILVA","PEDRO SILVA MARTINS","JOSE SILVA SANTOS","JOAO PEREIRA SANTOS","MARIA SANTOS OLIVEIRA"],["CARLA COSTA","ANA MARTINS PEREIRA","SHEILA SANTOS RODRIGUES","LAILA PEREIRA MARTINS","LUIZA COSTA PEREIRA","PEDRO OLIVEIRA SILVA","MARIANNA COSTA MARTINS","MARIA SILVA MARTINS","MARIANA SANTOS PEREIRA","JOA RODRIGUES PEREIRA","MARIANNA PEREIRA MARTINS","ANA MARTINS SANTOS","JOSE SILVA SANTOS","JOANA OLIVEIRA SILVA","JOA COSTA COSTA"],["M","M","M","F","M","F","M","F","M","F","M","M","F","M","F"],["16/03/1996","09/06/1975","21/11/1980","17/10/1976","03/02/1972","12/02/1999","19/11/1981","27/04/1976","20/04/1994","08/11/1987","14/03/1998","04/05/1991","03/08/1985","15/08/1986","03/10/1998"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>id<\/th>\n      <th>nome.x<\/th>\n      <th>nome_mae.x<\/th>\n      <th>sexo.x<\/th>\n      <th>dt_nasc.x<\/th>\n      <th>nome.y<\/th>\n      <th>nome_mae.y<\/th>\n      <th>sexo.y<\/th>\n      <th>dt_nasc.y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":1},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"id","targets":1},{"name":"nome.x","targets":2},{"name":"nome_mae.x","targets":3},{"name":"sexo.x","targets":4},{"name":"dt_nasc.x","targets":5},{"name":"nome.y","targets":6},{"name":"nome_mae.y","targets":7},{"name":"sexo.y","targets":8},{"name":"dt_nasc.y","targets":9}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
-<p>Reparem bem os registros:</p>
-<ul>
-<li>O registro cujo <strong>id = 6</strong> o <strong>PEDRO RODRIGUES OLIVEIRA</strong> é de fato a mesma pessoa ? Reparem o nome da mãe e a data de nascimento ?</li>
-<li>O registro cujo <strong>id = 39</strong> o <strong>CARLOS OLIVEIRA PEREIRA</strong> é de fato a mesma pessoa ? Reparem o nome da mãe ?</li>
-<li>O registro cujo <strong>id = 53</strong> o <strong>LUISA MARTINS COSTA</strong> é de fato a mesma pessoa ? Reparem o nome do banco 1 e diferente do banco 2 <strong>MARIANNA SANTOS RODRIGUEZ</strong> ?</li>
-<li>O registro cujo <strong>id = 83</strong> o <strong>LUIZA SILVA SANTOS</strong> é de fato a mesma pessoa ? Reparem o sexo e o nome da mãe ?</li>
-<li>O registro cujo <strong>id = 87</strong> o <strong>JOAO PEREIRA SANTOS</strong> é de fato a mesma pessoa ? Reparem na data de nascimento ?</li>
+<section id="atençâo-reparem-os-registros" class="level4">
+<h4 class="anchored" data-anchor-id="atençâo-reparem-os-registros">ATENÇÂO !!!!! Reparem os registros:</h4>
+<p>
+</p><ul>
+<li>O registro cujo <strong>id = 6</strong> o <strong>PEDRO RODRIGUES OLIVEIRA</strong> é de fato a mesma pessoa ? Reparem o nome da mãe e a data de nascimento ?
+<p></p></li>
+</ul>
+<p>
+</p><ul>
+<li>O registro cujo <strong>id = 39</strong> o <strong>CARLOS OLIVEIRA PEREIRA</strong> é de fato a mesma pessoa ? Reparem o nome da mãe ?
+<p></p></li>
+</ul>
+<p>
+</p><ul>
+<li>O registro cujo <strong>id = 53</strong> o <strong>LUISA MARTINS COSTA</strong> é de fato a mesma pessoa ? Reparem o nome do banco 1 e diferente do banco 2 <strong>MARIANNA SANTOS RODRIGUEZ</strong> ?
+<p></p></li>
+</ul>
+<p>
+</p><ul>
+<li>O registro cujo <strong>id = 83</strong> o <strong>LUIZA SILVA SANTOS</strong> é de fato a mesma pessoa ? Reparem o sexo e o nome da mãe ?
+<p></p></li>
+</ul>
+<p>
+</p><ul>
+<li>O registro cujo <strong>id = 87</strong> o <strong>JOAO PEREIRA SANTOS</strong> é de fato a mesma pessoa ? Reparem na data de nascimento ?
+<p></p></li>
 </ul>
 </section>
-<section id="utilizando-uma-chave-slk" class="level2">
-<h2 class="anchored" data-anchor-id="utilizando-uma-chave-slk">Utilizando uma chave SLK</h2>
-<p>SLK: <em>Statistical Linkage Key</em></p>
+</section>
+<section id="opção-2-utilizando-uma-chave-slk" class="level2">
+<h2 class="anchored" data-anchor-id="opção-2-utilizando-uma-chave-slk"><strong>Opção 2:</strong> Utilizando uma chave SLK</h2>
+<p>
+SLK: <em>Statistical Linkage Key</em>
+</p>
+<section id="criando-slk-com-o-nome-sexo-ano-nascimento" class="level4">
+<h4 class="anchored" data-anchor-id="criando-slk-com-o-nome-sexo-ano-nascimento">Criando SLK com o nome + sexo + ano nascimento</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando SLK com o nome + sexo + ano nascimento </span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>hash <span class="ot">&lt;-</span> <span class="fu">paste0</span>(banco1<span class="sc">$</span>nome, banco1<span class="sc">$</span>nome_mae, banco1<span class="sc">$</span>sexo, banco1<span class="sc">$</span>dt_nasc)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>hash <span class="ot">&lt;-</span> <span class="fu">sapply</span>(banco1<span class="sc">$</span>hash, digest, <span class="at">algo=</span><span class="st">&quot;md5&quot;</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>hash <span class="ot">&lt;-</span> <span class="fu">paste0</span>(banco2<span class="sc">$</span>nome, banco2<span class="sc">$</span>nome_mae, banco2<span class="sc">$</span>sexo, banco2<span class="sc">$</span>dt_nasc)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>hash <span class="ot">&lt;-</span> <span class="fu">sapply</span>(banco2<span class="sc">$</span>hash, digest, <span class="at">algo=</span><span class="st">&quot;md5&quot;</span>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>hash <span class="ot">&lt;-</span> <span class="fu">paste0</span>(banco1<span class="sc">$</span>nome, banco1<span class="sc">$</span>nome_mae, banco1<span class="sc">$</span>sexo, banco1<span class="sc">$</span>dt_nasc)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>hash <span class="ot">&lt;-</span> <span class="fu">sapply</span>(banco1<span class="sc">$</span>hash, digest, <span class="at">algo=</span><span class="st">&quot;md5&quot;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>hash <span class="ot">&lt;-</span> <span class="fu">paste0</span>(banco2<span class="sc">$</span>nome, banco2<span class="sc">$</span>nome_mae, banco2<span class="sc">$</span>sexo, banco2<span class="sc">$</span>dt_nasc)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>hash <span class="ot">&lt;-</span> <span class="fu">sapply</span>(banco2<span class="sc">$</span>hash, digest, <span class="at">algo=</span><span class="st">&quot;md5&quot;</span>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="vinculando-as-bases-utilizando-o-hash" class="level4">
+<h4 class="anchored" data-anchor-id="vinculando-as-bases-utilizando-o-hash">Vinculando as bases utilizando o <em>hash</em></h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Vinculando as bases utilizando o hash</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>bancos_unidos2 <span class="ot">&lt;-</span> <span class="fu">merge</span>(banco1, banco2, <span class="at">by =</span> <span class="st">&quot;hash&quot;</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(bancos_unidos2)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>bancos_unidos2 <span class="ot">&lt;-</span> <span class="fu">merge</span>(banco1, banco2, <span class="at">by =</span> <span class="st">&quot;hash&quot;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(bancos_unidos2)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1]  9 11</code></pre>
+<pre><code>[1]  6 11</code></pre>
 </div>
 </div>
-<p>Foram encontrados 9 registros comuns entre os bancos.</p>
+<p>
+Foram encontrados 9 registros comuns entre os bancos.
+</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(bancos_unidos2, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">5</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(bancos_unidos2, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">5</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-f6069fdf81ad37362a5f" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-f6069fdf81ad37362a5f">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9"],["203e3d4376a5a9eb7eb6bd6caf6c3bf4","2ba1c22e97ce51419f36a9eabdaf9de4","3e607fdb75c430a7d7c6d7b71601de9f","4aa0ba080f35dc2da591733da019bfc6","6534e97ff1a0dc3651db56450f78a4f6","6d0dcdf0ed439ef10c59ec0a3c603d5a","93a7bd17e88c98ee413453ae92f8a31d","a2cb1305dc0ab57a43f84894219b0199","f90a0202f39d346f48c5a545c66eed1a"],[55,95,76,98,80,68,48,63,20],["LUISA SILVA COSTA","CARLOS MARTINS COSTA","CARLOS COSTA SILVA","MARIA SANTOS OLIVEIRA","PEDRO SILVA MARTINS","PEDRO COSTA OLIVEIRA","CARLOS COSTA MARTINS","JOSE PEREIRA SANTOS","CARLOS SILVA COSTA"],["MARIA SILVA MARTINS","ANTONIA OLIVEIRA SANTOS","MARIANA PEREIRA MARTINS","JOAO COSTA COSTA","ANA MARTINS SANTOS","MARIA SANTOS PEREIRA","LUISA COSTA PEREIRA","MARIANA SANTOS PEREIRA","ANA MARTINS PEREIRA"],["F","M","M","F","M","M","M","M","M"],["27/04/1976","28/06/1975","14/03/1998","03/10/1998","04/05/1991","26/03/1973","03/02/1972","20/04/1994","09/06/1975"],[55,32,76,98,80,46,48,63,20],["LUISA SILVA COSTA","CARLOS MARTINS COSTA","CARLOS COSTA SILVA","MARIA SANTOS OLIVEIRA","PEDRO SILVA MARTINS","PEDRO COSTA OLIVEIRA","CARLOS COSTA MARTINS","JOSE PEREIRA SANTOS","CARLOS SILVA COSTA"],["MARIA SILVA MARTINS","ANTONIA OLIVEIRA SANTOS","MARIANA PEREIRA MARTINS","JOAO COSTA COSTA","ANA MARTINS SANTOS","MARIA SANTOS PEREIRA","LUISA COSTA PEREIRA","MARIANA SANTOS PEREIRA","ANA MARTINS PEREIRA"],["F","M","M","F","M","M","M","M","M"],["27/04/1976","28/06/1975","14/03/1998","03/10/1998","04/05/1991","26/03/1973","03/02/1972","20/04/1994","09/06/1975"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>hash<\/th>\n      <th>id.x<\/th>\n      <th>nome.x<\/th>\n      <th>nome_mae.x<\/th>\n      <th>sexo.x<\/th>\n      <th>dt_nasc.x<\/th>\n      <th>id.y<\/th>\n      <th>nome.y<\/th>\n      <th>nome_mae.y<\/th>\n      <th>sexo.y<\/th>\n      <th>dt_nasc.y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":[2,7]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"hash","targets":1},{"name":"id.x","targets":2},{"name":"nome.x","targets":3},{"name":"nome_mae.x","targets":4},{"name":"sexo.x","targets":5},{"name":"dt_nasc.x","targets":6},{"name":"id.y","targets":7},{"name":"nome.y","targets":8},{"name":"nome_mae.y","targets":9},{"name":"sexo.y","targets":10},{"name":"dt_nasc.y","targets":11}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-b032fccb9f4198fb67ef" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-b032fccb9f4198fb67ef">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6"],["203e3d4376a5a9eb7eb6bd6caf6c3bf4","2ba1c22e97ce51419f36a9eabdaf9de4","6534e97ff1a0dc3651db56450f78a4f6","6d0dcdf0ed439ef10c59ec0a3c603d5a","a2cb1305dc0ab57a43f84894219b0199","f90a0202f39d346f48c5a545c66eed1a"],[55,95,80,68,63,20],["LUISA SILVA COSTA","CARLOS MARTINS COSTA","PEDRO SILVA MARTINS","PEDRO COSTA OLIVEIRA","JOSE PEREIRA SANTOS","CARLOS SILVA COSTA"],["MARIA SILVA MARTINS","ANTONIA OLIVEIRA SANTOS","ANA MARTINS SANTOS","MARIA SANTOS PEREIRA","MARIANA SANTOS PEREIRA","ANA MARTINS PEREIRA"],["F","M","M","M","M","M"],["27/04/1976","28/06/1975","04/05/1991","26/03/1973","20/04/1994","09/06/1975"],[55,32,80,46,63,20],["LUISA SILVA COSTA","CARLOS MARTINS COSTA","PEDRO SILVA MARTINS","PEDRO COSTA OLIVEIRA","JOSE PEREIRA SANTOS","CARLOS SILVA COSTA"],["MARIA SILVA MARTINS","ANTONIA OLIVEIRA SANTOS","ANA MARTINS SANTOS","MARIA SANTOS PEREIRA","MARIANA SANTOS PEREIRA","ANA MARTINS PEREIRA"],["F","M","M","M","M","M"],["27/04/1976","28/06/1975","04/05/1991","26/03/1973","20/04/1994","09/06/1975"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>hash<\/th>\n      <th>id.x<\/th>\n      <th>nome.x<\/th>\n      <th>nome_mae.x<\/th>\n      <th>sexo.x<\/th>\n      <th>dt_nasc.x<\/th>\n      <th>id.y<\/th>\n      <th>nome.y<\/th>\n      <th>nome_mae.y<\/th>\n      <th>sexo.y<\/th>\n      <th>dt_nasc.y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":[2,7]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"hash","targets":1},{"name":"id.x","targets":2},{"name":"nome.x","targets":3},{"name":"nome_mae.x","targets":4},{"name":"sexo.x","targets":5},{"name":"dt_nasc.x","targets":6},{"name":"id.y","targets":7},{"name":"nome.y","targets":8},{"name":"nome_mae.y","targets":9},{"name":"sexo.y","targets":10},{"name":"dt_nasc.y","targets":11}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
+</section>
+<section id="dessa-forma-garantimos-que-os-pares-sejam-exatamente-os-mesmos." class="level4">
+<h4 class="anchored" data-anchor-id="dessa-forma-garantimos-que-os-pares-sejam-exatamente-os-mesmos.">Dessa forma, garantimos que os pares sejam exatamente os mesmos.</h4>
+</section>
 </section>
 </section>
 <section id="linkage-probabilístico" class="level1">
 <h1>Linkage Probabilístico</h1>
-<section id="preparando-as-variáveis" class="level2">
-<h2 class="anchored" data-anchor-id="preparando-as-variáveis">Preparando as variáveis</h2>
+<section id="separando-os-nomes" class="level2">
+<h2 class="anchored" data-anchor-id="separando-os-nomes">Separando os nomes</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraindo o primeiro nome</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>primeiro_nome <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco1<span class="sc">$</span>nome , <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="dv">1</span>])</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>primeiro_nome <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco2<span class="sc">$</span>nome , <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="dv">1</span>])</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraindo o último nome</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>ultimo_nome <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco1<span class="sc">$</span>nome, <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="fu">length</span>(x)])</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>ultimo_nome <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco2<span class="sc">$</span>nome, <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="fu">length</span>(x)])</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraindo o primeiro nome da mãe</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>primeiro_nomemae <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco1<span class="sc">$</span>nome_mae, <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="dv">1</span>])</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>primeiro_nomemae <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco2<span class="sc">$</span>nome_mae , <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="dv">1</span>])</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraindo o ultimo nome da mãe</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>ultimo_nomemae <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco1<span class="sc">$</span>nome_mae, <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="fu">length</span>(x)])</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>ultimo_nomemae <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco2<span class="sc">$</span>nome_mae, <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="fu">length</span>(x)])</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraindo o primeiro nome</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>primeiro_nome <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco1<span class="sc">$</span>nome , <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="dv">1</span>])</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>primeiro_nome <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco2<span class="sc">$</span>nome , <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="dv">1</span>])</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraindo o último nome</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>ultimo_nome <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco1<span class="sc">$</span>nome, <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="fu">length</span>(x)])</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>ultimo_nome <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco2<span class="sc">$</span>nome, <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="fu">length</span>(x)])</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraindo o primeiro nome da mãe</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>primeiro_nomemae <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco1<span class="sc">$</span>nome_mae, <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="dv">1</span>])</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>primeiro_nomemae <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco2<span class="sc">$</span>nome_mae , <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="dv">1</span>])</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraindo o ultimo nome da mãe</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>ultimo_nomemae <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco1<span class="sc">$</span>nome_mae, <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="fu">length</span>(x)])</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>ultimo_nomemae <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">strsplit</span>(banco2<span class="sc">$</span>nome_mae, <span class="st">&#39; &#39;</span>), <span class="cf">function</span>(x) x[<span class="fu">length</span>(x)])</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="utilizando-o-soundex" class="level2">
-<h2 class="anchored" data-anchor-id="utilizando-o-soundex">Utilizando o Soundex</h2>
+<h2 class="anchored" data-anchor-id="utilizando-o-soundex">Utilizando o <em>soundex</em></h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>primeiro_nome <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco1<span class="sc">$</span>primeiro_nome)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>primeiro_nome <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco2<span class="sc">$</span>primeiro_nome)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>ultimo_nome <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco1<span class="sc">$</span>ultimo_nome)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>ultimo_nome <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco2<span class="sc">$</span>ultimo_nome)</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>primeiro_nomemae <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco1<span class="sc">$</span>primeiro_nomemae)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>primeiro_nomemae <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco2<span class="sc">$</span>primeiro_nomemae)</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>ultimo_nomemae <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco1<span class="sc">$</span>ultimo_nomemae)</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>ultimo_nomemae <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco2<span class="sc">$</span>ultimo_nomemae)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>primeiro_nome <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco1<span class="sc">$</span>primeiro_nome)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>primeiro_nome <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco2<span class="sc">$</span>primeiro_nome)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>ultimo_nome <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco1<span class="sc">$</span>ultimo_nome)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>ultimo_nome <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco2<span class="sc">$</span>ultimo_nome)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>primeiro_nomemae <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco1<span class="sc">$</span>primeiro_nomemae)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>primeiro_nomemae <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco2<span class="sc">$</span>primeiro_nomemae)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>banco1<span class="sc">$</span>ultimo_nomemae <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco1<span class="sc">$</span>ultimo_nomemae)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>banco2<span class="sc">$</span>ultimo_nomemae <span class="ot">&lt;-</span> <span class="fu">phonetic</span>(banco2<span class="sc">$</span>ultimo_nomemae)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="biblioteca-reclin2" class="level2">
 <h2 class="anchored" data-anchor-id="biblioteca-reclin2">Biblioteca <a href="https://github.com/djvanderlaan/reclin2">reclin2</a></h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reclin2)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-layout-align="center" data-comments="null">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reclin2)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Em princípio, linkage consiste em comparar cada combinação de registos de dois conjuntos de dados e determinar quais dessas combinações (ou pares) pertencem à mesma entidade. No caso de uma chave de ligação perfeita, obviamente não é necessário comparar todas as combinações de registros, mas quando as chaves de ligação são imperfeitas e contêm erros, é em princípio necessário comparar todos os pares.</p>
-<p>No entanto, comparar todos os pares pode resultar num número intratável de pares: ao ligar dois conjuntos de dados com um milhão de registos, existem 1012 pares possíveis. Portanto, geralmente é aplicado algum tipo de redução dos pares possíveis.</p>
-<p>No exemplo abaixo aplicamos o bloco (ou bloqueio), o que significa que os pares só são gerados quando concordam com a variável de bloco (neste caso o usaremos o primeiro_nome, o último_nome e o primeiro_nomemae). Isso significa que pares de registros que discordam na variável de bloco não são considerados pares. Portanto, só serão utilizadas variáveis que possam ser consideradas sem erros como variáveis de bloco, ou vinculadas múltiplas vezes com diferentes variáveis de bloqueio e combinados os dois conjuntos de dados.</p>
-<p><strong>Passo 1:</strong> O primeiro passo na ligação (probabilística) é, portanto, gerar todos os pares.</p>
+<!-- Em princípio, linkage consiste em comparar cada combinação de registos de dois conjuntos de dados e determinar quais dessas combinações (ou pares) pertencem à mesma entidade. No caso de uma chave de ligação perfeita, obviamente não é necessário comparar todas as combinações de registros, mas quando as chaves de ligação são imperfeitas e contêm erros, é em princípio necessário comparar todos os pares. -->
+<!-- No entanto, comparar todos os pares pode resultar num número intratável de pares: ao ligar dois conjuntos de dados com um milhão de registos, existem 1012 pares possíveis. Portanto, geralmente é aplicado algum tipo de redução dos pares possíveis.  -->
+<!-- No exemplo abaixo aplicamos o bloco (ou bloqueio), o que significa que os pares só são gerados quando concordam com a variável de bloco (neste caso o usaremos o primeiro_nome, o último_nome e o primeiro_nomemae). Isso significa que pares de registros que discordam na variável de bloco não são considerados pares. Portanto, só serão utilizadas variáveis que possam ser consideradas sem erros como variáveis de bloco, ou vinculadas múltiplas vezes com diferentes variáveis de bloqueio e combinados os dois conjuntos de dados. -->
+<section id="passo-1-gerar-todos-os-possíveis-pares-utilizando-os-blocos-primeiro_nome-ultimo_nome-primeiro_nomemae.-é-importante-resaltar-que-os-nomes-separados-já-estão-com-o-soundex." class="level4">
+<h4 class="anchored" data-anchor-id="passo-1-gerar-todos-os-possíveis-pares-utilizando-os-blocos-primeiro_nome-ultimo_nome-primeiro_nomemae.-é-importante-resaltar-que-os-nomes-separados-já-estão-com-o-soundex."><strong>Passo 1:</strong> Gerar todos os possíveis pares utilizando os blocos: “primeiro_nome”, “ultimo_nome”, “primeiro_nomemae”. É importante resaltar que os nomes separados já estão com o <em>soundex</em>.</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>pares <span class="ot">&lt;-</span> <span class="fu">pair_blocking</span>(banco1, banco2, <span class="fu">c</span>(<span class="st">&quot;primeiro_nome&quot;</span>, <span class="st">&quot;ultimo_nome&quot;</span>, <span class="st">&quot;primeiro_nomemae&quot;</span>))</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(pares, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">5</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>pares <span class="ot">&lt;-</span> <span class="fu">pair_blocking</span>(banco1, banco2, <span class="fu">c</span>(<span class="st">&quot;primeiro_nome&quot;</span>, <span class="st">&quot;ultimo_nome&quot;</span>, <span class="st">&quot;primeiro_nomemae&quot;</span>))</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(pares, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">5</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-e4fe51a6b0c5454850a9" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-e4fe51a6b0c5454850a9">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14"],[1,11,13,6,5,19,21,25,28,27,33,36,40,38],[1,8,9,6,5,13,15,17,21,20,24,29,33,31]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>.x<\/th>\n      <th>.y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":".x","targets":1},{"name":".y","targets":2}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-5f87a8fca44325411e27" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-5f87a8fca44325411e27">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14"],[1,11,13,6,5,19,21,25,28,27,33,36,40,38],[1,8,9,6,5,13,15,17,21,20,24,29,33,31]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>.x<\/th>\n      <th>.y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":".x","targets":1},{"name":".y","targets":2}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
-<p>Como vocês podem ver, os registro 6 e 10 de x (o primeiro conjunto de dados) estão sendo comparados aos registros 8 e 9 de y, ou seja, abos com os mesmo primeiros e ultimos nomes.</p>
-<p><strong>Passo 2:</strong> Comparação dos pares</p>
+<p>
+</p><ul>
+<li>Como vocês podem ver, os registro 1 de x (banco1) estão sendo comparados ao registros 1 de y (banco2).
+<p></p></li>
+</ul>
+<p>
+</p><ul>
+<li>O registro 11 de x (o primeiro conjunto de dados) estão sendo comparados ao registros 8 de y (banco2).
+<p></p></li>
+</ul>
+<p>
+Os pares de registros devem ter o mesmo conteúdo das chaves de blocagem (“primeiro_nome”, “ultimo_nome”, “primeiro_nomemae”).
+</p>
+</section>
+<section id="passo-2-comparação-dos-pares-utilizando-a-métrica-de-similaridade-jaro-winkler" class="level4">
+<h4 class="anchored" data-anchor-id="passo-2-comparação-dos-pares-utilizando-a-métrica-de-similaridade-jaro-winkler"><strong>Passo 2:</strong> Comparação dos pares utilizando a métrica de similaridade <em>Jaro Winkler</em></h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pares <span class="ot">&lt;-</span> <span class="fu">compare_pairs</span>(pares, <span class="at">on =</span> <span class="fu">c</span>(<span class="st">&quot;nome&quot;</span>, <span class="st">&quot;nome_mae&quot;</span>, <span class="st">&quot;sexo&quot;</span>, <span class="st">&quot;dt_nasc&quot;</span>), <span class="at">default_comparator =</span> <span class="fu">cmp_jarowinkler</span>(<span class="fl">0.9</span>), <span class="at">inplace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(pares, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">5</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>tabela <span class="ot">&lt;-</span> <span class="fu">compare_pairs</span>(pares, <span class="at">on =</span> <span class="fu">c</span>(<span class="st">&quot;nome&quot;</span>, <span class="st">&quot;nome_mae&quot;</span>, <span class="st">&quot;dt_nasc&quot;</span>), <span class="at">default_comparator =</span> <span class="fu">cmp_jarowinkler</span>(), <span class="at">inplace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(tabela, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">5</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-599773bd35eb432b29bf" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-599773bd35eb432b29bf">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14"],[1,11,13,6,5,19,21,25,28,27,33,36,40,38],[1,8,9,6,5,13,15,17,21,20,24,29,33,31],[0.9855072463768115,1,1,1,1,1,1,1,1,0.7695075757575758,1,0.9848484848484849,1,1],[1,1,1,1,1,1,1,1,1,0.863997113997114,1,1,1,1],[1,1,1,1,1,1,0,1,1,1,1,0,1,1],[1,1,1,1,1,0.9333333333333332,1,1,1,0.8041666666666667,1,1,1,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>.x<\/th>\n      <th>.y<\/th>\n      <th>nome<\/th>\n      <th>nome_mae<\/th>\n      <th>sexo<\/th>\n      <th>dt_nasc<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4,5,6]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":".x","targets":1},{"name":".y","targets":2},{"name":"nome","targets":3},{"name":"nome_mae","targets":4},{"name":"sexo","targets":5},{"name":"dt_nasc","targets":6}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-062717e2ae3f01217858" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-062717e2ae3f01217858">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14"],[1,11,13,6,5,19,21,25,28,27,33,36,40,38],[1,8,9,6,5,13,15,17,21,20,24,29,33,31],[0.9855072463768115,1,1,1,1,1,1,1,1,0.7695075757575758,1,0.9848484848484849,1,1],[1,1,1,0.9186159844054581,0.9861111111111112,1,0.9848484848484849,1,1,0.8521394064872325,0.8791666666666667,0.9610389610389609,1,1],[1,1,1,1,1,0.9333333333333332,1,1,1,0.8041666666666667,1,1,1,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>.x<\/th>\n      <th>.y<\/th>\n      <th>nome<\/th>\n      <th>nome_mae<\/th>\n      <th>dt_nasc<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4,5]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":".x","targets":1},{"name":".y","targets":2},{"name":"nome","targets":3},{"name":"nome_mae","targets":4},{"name":"dt_nasc","targets":5}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
-<p>Como podemos ver, não precisamos passar os conjuntos de dados originais, embora as variáveis nome, nome_mae, dt_nasc sejam desses conjuntos de dados originais. Isso ocorre porque uma cópia dos conjuntos de dados originais é armazenada com os pares de objetos (e você deve estar preocupado com a memória: desde que os conjuntos de dados originais não sejam modificados, os conjuntos de dados não são realmente copiados).</p>
-<p>A função de comparação padrão retorna TRUE quando as chaves de ligação concordam e false quando não concordam. No entanto, ao observar os conjuntos de dados originais, podemos ver que a maioria de nossas chaves de ligação são variáveis de string que contêm erros de digitação. A qualidade da nossa ligação poderia ser melhorada se pudéssemos usar uma pontuação de similaridade para comparar as duas cadeias: uma pontuação alta significa que as duas cadeias são muito semelhantes, um valor próximo de zero significa que as cadeias são muito diferentes.</p>
-<p><strong>Passo 3:</strong> Escore dos pares</p>
-<p>A próxima etapa do processo é determinar quais pares de registros pertencem à mesma entidade e quais não. Existem inúmeras maneiras de fazer isso. Uma possibilidade é rotular alguns dos pares como correspondentes ou não e usar algum algoritmo de aprendizado de máquina para prever o status da correspondência usando os vetores de comparação.</p>
-<p>Tradicionalmente, é utilizado o quadro de ligação probabilística inicialmente formalizado por Fellegi e Sunter. A função <span class="math inline">\(problink_{em}\)</span> usa um algoritmo EM para estimar as chamadas probabilidades <em>m</em> e <em>u</em> para cada uma das variáveis de ligação.</p>
-<p>A probabilidade <em>m</em> é a probabilidade de dois registros relativos à mesma entidade concordarem na variável de ligação; isso significa que a probabilidade <em>m</em> corresponde à probabilidade de haver erro nas variáveis de ligação.</p>
-<p>A probabilidade <em>u</em> é a probabilidade de dois registros pertencentes a entidades diferentes concordarem em uma variável. Para uma variável com poucas categorias (como o sexo) esta probabilidade será grande, enquanto que para uma variável com um grande número de categorias (como o sobrenome) esta probabilidade será pequena.</p>
+<p>
+</p><ul>
+<li>O registro 1 de x (banco1) estão sendo comparados ao registros 1 de y (banco2), está com probalidae de similaridade de <span class="math inline">\(0.9855\)</span> no nome. Isso está acontecendo porque no banco 1 o nome = “Ana de Oliveira Rodrigues” e no banco2 o nome = “Anna de Oliveira Rodrigues”, veja:
+<p></p></li>
+</ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">problink_em</span>(<span class="sc">~</span> nome <span class="sc">+</span> nome_mae <span class="sc">+</span> sexo <span class="sc">+</span> dt_nasc, <span class="at">data =</span> pares)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in problink_em(~nome + nome_mae + sexo + dt_nasc, data = pares):
-u-probabilities close to 1 occured; probably converged to wrong solution
-
-Warning in problink_em(~nome + nome_mae + sexo + dt_nasc, data = pares):
-u-probabilities close to 1 occured; probably converged to wrong solution</code></pre>
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-431be680d91124993fe3" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-431be680d91124993fe3">{"x":{"filter":"none","vertical":false,"data":[["1","2","3"],["Probabilidades","banco1","banco2"],["-","77","78"],["0.9855","ANA OLIVEIRA RODRIGUES","ANNA OLIVEIRA RODRIGUES"],["1","MARIANA SANTOS SANTOS","MARIANA SANTOS SANTOS"],["-","F","F"],["1","27/02/1973","27/02/1973"]],"container":"<table class=\"cell-border stripe\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>banco<\/th>\n      <th>id<\/th>\n      <th>nome<\/th>\n      <th>nome_mae<\/th>\n      <th>sexo<\/th>\n      <th>dt_nasc<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","paging":false,"searching":false,"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"banco","targets":1},{"name":"id","targets":2},{"name":"nome","targets":3},{"name":"nome_mae","targets":4},{"name":"sexo","targets":5},{"name":"dt_nasc","targets":6}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[1]; $(this.api().cell(row, 1).node()).css({'text-align':'center'});\nvar value=data[2]; $(this.api().cell(row, 2).node()).css({'text-align':'center'});\nvar value=data[3]; $(this.api().cell(row, 3).node()).css({'text-align':'center'});\nvar value=data[4]; $(this.api().cell(row, 4).node()).css({'text-align':'center'});\nvar value=data[5]; $(this.api().cell(row, 5).node()).css({'text-align':'center'});\nvar value=data[6]; $(this.api().cell(row, 6).node()).css({'text-align':'center'});\n}"},"callback":"function(table) {\n$(table.table().container()).css('text-align', 'center');\n}"},"evals":["options.rowCallback","callback"],"jsHooks":[]}</script>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in problink_em(~nome + nome_mae + sexo + dt_nasc, data = pares):
-m-probabilities for &#39;sexo&#39; are smaller than or equal to u-probabilities;
-probably converged to wrong solution</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(m)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>
+</p><ul>
+<li>O registro 27 de x (banco1) estão sendo comparados ao registros 20 de y (banco2), está com probabilidade de similaridade de <span class="math inline">\(0.7695\)</span> no nome, de <span class="math inline">\(0.8639\)</span> no nome_mae e de <span class="math inline">\(0.8041\)</span> na dt_nasc, veja:
+<p></p></li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-f51356a0d3bc240104d1" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-f51356a0d3bc240104d1">{"x":{"filter":"none","vertical":false,"data":[["1","2","3"],["Probabilidades","banco1","banco2"],["-","99","94"],["0.7695","LUISA OLIVEIRA MARTINS","LUISA SANTOS MARTINS"],["0.8639","MARIANA COSTA PEREIRA","MARIANA COSTA OLIVEIRA"],["-","F","F"],["0.8041","24/05/1982","25/02/1998"]],"container":"<table class=\"cell-border stripe\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>banco<\/th>\n      <th>id<\/th>\n      <th>nome<\/th>\n      <th>nome_mae<\/th>\n      <th>sexo<\/th>\n      <th>dt_nasc<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","paging":false,"searching":false,"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"banco","targets":1},{"name":"id","targets":2},{"name":"nome","targets":3},{"name":"nome_mae","targets":4},{"name":"sexo","targets":5},{"name":"dt_nasc","targets":6}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[1]; $(this.api().cell(row, 1).node()).css({'text-align':'center'});\nvar value=data[2]; $(this.api().cell(row, 2).node()).css({'text-align':'center'});\nvar value=data[3]; $(this.api().cell(row, 3).node()).css({'text-align':'center'});\nvar value=data[4]; $(this.api().cell(row, 4).node()).css({'text-align':'center'});\nvar value=data[5]; $(this.api().cell(row, 5).node()).css({'text-align':'center'});\nvar value=data[6]; $(this.api().cell(row, 6).node()).css({'text-align':'center'});\n}"},"callback":"function(table) {\n$(table.table().container()).css('text-align', 'center');\n}"},"evals":["options.rowCallback","callback"],"jsHooks":[]}</script>
+</div>
+</div>
+<!-- Como podemos ver, não precisamos passar os conjuntos de dados originais, embora as variáveis nome, nome_mae, dt_nasc sejam desses conjuntos de dados originais. Isso ocorre porque uma cópia dos conjuntos de dados originais é armazenada com os pares de objetos (e você deve estar preocupado com a memória: desde que os conjuntos de dados originais não sejam modificados, os conjuntos de dados não são realmente copiados). -->
+<!-- A função de comparação padrão retorna TRUE quando as chaves de ligação concordam e false quando não concordam. No entanto, ao observar os conjuntos de dados originais, podemos ver que a maioria de nossas chaves de ligação são variáveis de string que contêm erros de digitação. A qualidade da nossa ligação poderia ser melhorada se pudéssemos usar uma pontuação de similaridade para comparar as duas cadeias: uma pontuação alta significa que as duas cadeias são muito semelhantes, um valor próximo de zero significa que as cadeias são muito diferentes. -->
+</section>
+<section id="passo-3-identificando-os-pares---modelo-de-fellegi-e-sunter" class="level4">
+<h4 class="anchored" data-anchor-id="passo-3-identificando-os-pares---modelo-de-fellegi-e-sunter"><strong>Passo 3:</strong> Identificando os pares - Modelo de Fellegi e Sunter</h4>
+<!-- A próxima etapa do processo é determinar quais pares de registros pertencem à mesma entidade e quais não. Existem inúmeras maneiras de fazer isso. Uma possibilidade é rotular alguns dos pares como correspondentes ou não e usar algum algoritmo de aprendizado de máquina para prever o status da correspondência usando os vetores de comparação. -->
+<!-- Tradicionalmente, é utilizado o quadro de ligação probabilística inicialmente formalizado por Fellegi e Sunter. A função $problink_{em}$ usa um algoritmo EM para estimar as chamadas probabilidades *m* e *u* para cada uma das variáveis de ligação. -->
+<!-- A probabilidade *m* é a probabilidade de dois registros relativos à mesma entidade concordarem na variável de ligação; isso significa que a probabilidade *m* corresponde à probabilidade de haver erro nas variáveis de ligação. -->
+<!-- A probabilidade *u* é a probabilidade de dois registros pertencentes a entidades diferentes concordarem em uma variável. Para uma variável com poucas categorias (como o sexo) esta probabilidade será grande, enquanto que para uma variável com um grande número de categorias (como o sobrenome) esta probabilidade será pequena. -->
+<!-- ```{r} -->
+<!-- m <- problink_em(~ nome + nome_mae + sexo + dt_nasc, data = pares) -->
+<!-- pares <- predict(m, pairs = pares, add = TRUE) -->
+<!-- print(pares) -->
+<!-- ``` -->
+<!-- Essas probabilidades *m* e *u* podem ser usadas para pontuar os pares: -->
+<!-- ```{r} -->
+<!-- pares <- predict(m, pairs = pares, add = TRUE) -->
+<!-- print(pares) -->
+<!-- ``` -->
+<!-- Um método mais simples é basear a pontuação diretamente nas pontuações de similaridade, calculando uma soma (ponderada) das pontuações de similaridade. Quanto maior a pontuação, mais semelhantes são os dois registros do par. No caso mais simples, score_simple apenas calcula a soma das pontuações de similaridade das variáveis comparadas: -->
+<!-- ```{r} -->
+<!-- pares <- score_simple(pares, "score",  on = c("nome", "nome_mae", "sexo")) -->
+<!-- pares -->
+<!-- ``` -->
+<!-- #### **Passo 4:** Selecionando os pares -->
+<!-- A etapa final é selecionar os pares que são considerados pertencentes às mesmas entidades. O método mais simples é selecionar todos os pares acima de um determinado limite -->
+<div class="cell" data-layout-align="center" data-comments="null">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Modelo de Fellegi e Sunter (probabilidade M e U)</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">problink_em</span>(<span class="sc">~</span> nome <span class="sc">+</span> nome_mae <span class="sc">+</span> dt_nasc, <span class="at">data =</span> tabela)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>m</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>M- and u-probabilities estimated by the EM-algorithm:
  Variable M-probability U-probability
      nome     0.9990000        0.0001
- nome_mae     0.9990000        0.0001
-     sexo     0.8461538        0.9990
-  dt_nasc     0.9990000        0.0001
+ nome_mae     0.8461438        0.0001
+  dt_nasc     0.9230660        0.0001
 
-Matching probability: 0.9285714.</code></pre>
+Matching probability: 0.9285824.</code></pre>
 </div>
 </div>
-<p>Essas probabilidades <em>m</em> e <em>u</em> podem ser usadas para pontuar os pares:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>pares <span class="ot">&lt;-</span> <span class="fu">predict</span>(m, <span class="at">pairs =</span> pares, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pares)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-layout-align="center" data-comments="null">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculando os pesos (weights) em função das probabilidades M e U</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>tabela2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(m, <span class="at">pairs =</span> tabela, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Escolhendo o ponto de corte (threshold &gt; 20) em função dos pesos (weights) </span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>tabela3 <span class="ot">&lt;-</span> <span class="fu">select_threshold</span>(tabela2, <span class="st">&quot;threshold&quot;</span>, <span class="at">score =</span> <span class="st">&quot;weights&quot;</span>, <span class="at">threshold =</span> <span class="dv">20</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>tabela3</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  First data set:  42 records
   Second data set: 34 records
   Total number of pairs: 14 pairs
   Blocking on: &#39;primeiro_nome&#39;, &#39;ultimo_nome&#39;, &#39;primeiro_nomemae&#39;
 
-       .x    .y      nome  nome_mae  sexo   dt_nasc   weights
-    &lt;int&gt; &lt;int&gt;     &lt;num&gt;     &lt;num&gt; &lt;num&gt;     &lt;num&gt;     &lt;num&gt;
- 1:     1     1 0.9855072 1.0000000     1 1.0000000 22.464470
- 2:    11     8 1.0000000 1.0000000     1 1.0000000 27.461966
- 3:    13     9 1.0000000 1.0000000     1 1.0000000 27.461966
- 4:     6     6 1.0000000 1.0000000     1 1.0000000 27.461966
- 5:     5     5 1.0000000 1.0000000     1 1.0000000 27.461966
- 6:    19    13 1.0000000 1.0000000     1 0.9333333 20.889455
- 7:    21    15 1.0000000 1.0000000     0 1.0000000 32.663973
- 8:    25    17 1.0000000 1.0000000     1 1.0000000 27.461966
- 9:    28    21 1.0000000 1.0000000     1 1.0000000 27.461966
-10:    27    20 0.7695076 0.8639971     1 0.8041667  4.297535
-11:    33    24 1.0000000 1.0000000     1 1.0000000 27.461966
-12:    36    29 0.9848485 1.0000000     0 1.0000000 27.621655
-13:    40    33 1.0000000 1.0000000     1 1.0000000 27.461966
-14:    38    31 1.0000000 1.0000000     1 1.0000000 27.461966</code></pre>
+       .x    .y      nome  nome_mae   dt_nasc   weights threshold
+    &lt;int&gt; &lt;int&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;    &lt;lgcl&gt;
+ 1:     1     1 0.9855072 1.0000000 1.0000000 22.385405      TRUE
+ 2:    11     8 1.0000000 1.0000000 1.0000000 27.382900      TRUE
+ 3:    13     9 1.0000000 1.0000000 1.0000000 27.382900      TRUE
+ 4:     6     6 1.0000000 0.9186160 1.0000000 20.611202      TRUE
+ 5:     5     5 1.0000000 0.9861111 1.0000000 22.430822      TRUE
+ 6:    19    13 1.0000000 1.0000000 0.9333333 20.816254      TRUE
+ 7:    21    15 1.0000000 0.9848485 1.0000000 22.343361      TRUE
+ 8:    25    17 1.0000000 1.0000000 1.0000000 27.382900      TRUE
+ 9:    28    21 1.0000000 1.0000000 1.0000000 27.382900      TRUE
+10:    27    20 0.7695076 0.8521394 0.8041667  4.171871     FALSE
+11:    33    24 1.0000000 0.8791667 1.0000000 20.181179      TRUE
+12:    36    29 0.9848485 0.9610390 1.0000000 16.340676     FALSE
+13:    40    33 1.0000000 1.0000000 1.0000000 27.382900      TRUE
+14:    38    31 1.0000000 1.0000000 1.0000000 27.382900      TRUE</code></pre>
 </div>
 </div>
-<p>Um método mais simples é basear a pontuação diretamente nas pontuações de similaridade, calculando uma soma (ponderada) das pontuações de similaridade. Quanto maior a pontuação, mais semelhantes são os dois registros do par. No caso mais simples, score_simple apenas calcula a soma das pontuações de similaridade das variáveis comparadas:</p>
+<!-- As funções selecionadas adicionam uma variável (lógica) ao conjunto de dados indicando se um par está selecionado ou não. -->
+<!-- Neste caso sabemos quais registros realmente pertencem um ao outro. Podemos usar isso para avaliar a ligação: -->
+<!-- ```{r} -->
+<!-- pares <- compare_vars(pares, "truth", on_x = "id", on_y = "id") -->
+<!-- print(pares) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- table(pares$truth, pares$threshold) -->
+<!-- ``` -->
+</section>
+<section id="passo-final-tabelas-com-os-pares." class="level4">
+<h4 class="anchored" data-anchor-id="passo-final-tabelas-com-os-pares."><strong>Passo Final:</strong> Tabelas com os pares.</h4>
+<!-- A verdadeira etapa final é criar o conjunto de dados consolidado. Agora sabemos quais pares serão consolidados, mas ainda precisamos vinculá-los. A função *link* faz isso (os argumentos opcionais *all_x* e *all_y* controlam o tipo de ligação): -->
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>pares <span class="ot">&lt;-</span> <span class="fu">score_simple</span>(pares, <span class="st">&quot;score&quot;</span>,  <span class="at">on =</span> <span class="fu">c</span>(<span class="st">&quot;nome&quot;</span>, <span class="st">&quot;nome_mae&quot;</span>, <span class="st">&quot;sexo&quot;</span>))</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>pares</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  First data set:  42 records
-  Second data set: 34 records
-  Total number of pairs: 14 pairs
-  Blocking on: &#39;primeiro_nome&#39;, &#39;ultimo_nome&#39;, &#39;primeiro_nomemae&#39;
-
-       .x    .y      nome  nome_mae  sexo   dt_nasc   weights    score
-    &lt;int&gt; &lt;int&gt;     &lt;num&gt;     &lt;num&gt; &lt;num&gt;     &lt;num&gt;     &lt;num&gt;    &lt;num&gt;
- 1:     1     1 0.9855072 1.0000000     1 1.0000000 22.464470 2.985507
- 2:    11     8 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 3:    13     9 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 4:     6     6 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 5:     5     5 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 6:    19    13 1.0000000 1.0000000     1 0.9333333 20.889455 3.000000
- 7:    21    15 1.0000000 1.0000000     0 1.0000000 32.663973 2.000000
- 8:    25    17 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 9:    28    21 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
-10:    27    20 0.7695076 0.8639971     1 0.8041667  4.297535 2.633505
-11:    33    24 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
-12:    36    29 0.9848485 1.0000000     0 1.0000000 27.621655 1.984848
-13:    40    33 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
-14:    38    31 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000</code></pre>
-</div>
-</div>
-<p><strong>Passo 4:</strong> Selecionando os pares</p>
-<p>A etapa final é selecionar os pares que são considerados pertencentes às mesmas entidades. O método mais simples é selecionar todos os pares acima de um determinado limite</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>pares <span class="ot">&lt;-</span> <span class="fu">select_threshold</span>(pares, <span class="st">&quot;threshold&quot;</span>, <span class="at">score =</span> <span class="st">&quot;weights&quot;</span>, <span class="at">threshold =</span> <span class="dv">9</span>)</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pares)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  First data set:  42 records
-  Second data set: 34 records
-  Total number of pairs: 14 pairs
-  Blocking on: &#39;primeiro_nome&#39;, &#39;ultimo_nome&#39;, &#39;primeiro_nomemae&#39;
-
-       .x    .y      nome  nome_mae  sexo   dt_nasc   weights    score
-    &lt;int&gt; &lt;int&gt;     &lt;num&gt;     &lt;num&gt; &lt;num&gt;     &lt;num&gt;     &lt;num&gt;    &lt;num&gt;
- 1:     1     1 0.9855072 1.0000000     1 1.0000000 22.464470 2.985507
- 2:    11     8 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 3:    13     9 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 4:     6     6 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 5:     5     5 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 6:    19    13 1.0000000 1.0000000     1 0.9333333 20.889455 3.000000
- 7:    21    15 1.0000000 1.0000000     0 1.0000000 32.663973 2.000000
- 8:    25    17 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 9:    28    21 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
-10:    27    20 0.7695076 0.8639971     1 0.8041667  4.297535 2.633505
-11:    33    24 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
-12:    36    29 0.9848485 1.0000000     0 1.0000000 27.621655 1.984848
-13:    40    33 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
-14:    38    31 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
-    threshold
-       &lt;lgcl&gt;
- 1:      TRUE
- 2:      TRUE
- 3:      TRUE
- 4:      TRUE
- 5:      TRUE
- 6:      TRUE
- 7:      TRUE
- 8:      TRUE
- 9:      TRUE
-10:     FALSE
-11:      TRUE
-12:      TRUE
-13:      TRUE
-14:      TRUE</code></pre>
-</div>
-</div>
-<p>As funções selecionadas adicionam uma variável (lógica) ao conjunto de dados indicando se um par está selecionado ou não.</p>
-<p>Neste caso sabemos quais registros realmente pertencem um ao outro. Podemos usar isso para avaliar a ligação:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>pares <span class="ot">&lt;-</span> <span class="fu">compare_vars</span>(pares, <span class="st">&quot;truth&quot;</span>, <span class="at">on_x =</span> <span class="st">&quot;id&quot;</span>, <span class="at">on_y =</span> <span class="st">&quot;id&quot;</span>)</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pares)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  First data set:  42 records
-  Second data set: 34 records
-  Total number of pairs: 14 pairs
-  Blocking on: &#39;primeiro_nome&#39;, &#39;ultimo_nome&#39;, &#39;primeiro_nomemae&#39;
-
-       .x    .y      nome  nome_mae  sexo   dt_nasc   weights    score
-    &lt;int&gt; &lt;int&gt;     &lt;num&gt;     &lt;num&gt; &lt;num&gt;     &lt;num&gt;     &lt;num&gt;    &lt;num&gt;
- 1:     1     1 0.9855072 1.0000000     1 1.0000000 22.464470 2.985507
- 2:    11     8 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 3:    13     9 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 4:     6     6 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 5:     5     5 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 6:    19    13 1.0000000 1.0000000     1 0.9333333 20.889455 3.000000
- 7:    21    15 1.0000000 1.0000000     0 1.0000000 32.663973 2.000000
- 8:    25    17 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
- 9:    28    21 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
-10:    27    20 0.7695076 0.8639971     1 0.8041667  4.297535 2.633505
-11:    33    24 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
-12:    36    29 0.9848485 1.0000000     0 1.0000000 27.621655 1.984848
-13:    40    33 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
-14:    38    31 1.0000000 1.0000000     1 1.0000000 27.461966 3.000000
-    threshold  truth
-       &lt;lgcl&gt; &lt;lgcl&gt;
- 1:      TRUE  FALSE
- 2:      TRUE   TRUE
- 3:      TRUE  FALSE
- 4:      TRUE   TRUE
- 5:      TRUE   TRUE
- 6:      TRUE   TRUE
- 7:      TRUE   TRUE
- 8:      TRUE   TRUE
- 9:      TRUE   TRUE
-10:     FALSE  FALSE
-11:      TRUE   TRUE
-12:      TRUE   TRUE
-13:      TRUE   TRUE
-14:      TRUE  FALSE</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(pares<span class="sc">$</span>truth, pares<span class="sc">$</span>threshold)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>       
-        FALSE TRUE
-  FALSE     1    3
-  TRUE      0   10</code></pre>
-</div>
-</div>
-<p><strong>Passo Final:</strong> Último Passo !!!!!</p>
-<p>A verdadeira etapa final é criar o conjunto de dados consolidado. Agora sabemos quais pares serão consolidados, mas ainda precisamos vinculá-los. A função <em>link</em> faz isso (os argumentos opcionais <em>all_x</em> e <em>all_y</em> controlam o tipo de ligação):</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>linked_data_set <span class="ot">&lt;-</span> <span class="fu">link</span>(pares)</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(linked_data_set, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">15</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtendo os pares</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>linked_data_set <span class="ot">&lt;-</span> <span class="fu">link</span>(tabela3)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Selecionando e arrumando as variáveis com dos pares na tabela</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>linked_data_set <span class="ot">&lt;-</span> linked_data_set <span class="sc">|&gt;</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">select</span>(id.x, id.y, nome.x, nome.y, nome_mae.x, nome_mae.y, </span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>                           sexo.x, sexo.y, dt_nasc.x, dt_nasc.y)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Gerando a tabela com os pares</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(linked_data_set, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">7</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-43cb3a5335da94164eec" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-43cb3a5335da94164eec">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14"],[1,5,6,8,9,13,15,17,20,21,24,29,31,33],[1,5,6,11,13,19,21,25,27,28,33,36,38,40],[77,76,48,20,95,87,54,63,99,55,98,67,68,80],["ANA OLIVEIRA RODRIGUES","CARLOS COSTA SILVA","CARLOS COSTA MARTINS","CARLOS SILVA COSTA","CARLOS MARTINS COSTA","JOAO PEREIRA SANTOS","JOSE SANTOS PEREIRA","JOSE PEREIRA SANTOS","LUISA OLIVEIRA MARTINS","LUISA SILVA COSTA","MARIA SANTOS OLIVEIRA","MARIANA SILVA PEREIRA","PEDRO COSTA OLIVEIRA","PEDRO SILVA MARTINS"],["MARIANA SANTOS SANTOS","MARIANA PEREIRA MARTINS","LUISA COSTA PEREIRA","ANA MARTINS PEREIRA","ANTONIA OLIVEIRA SANTOS","JOANA OLIVEIRA SILVA","MARIANA COSTA MARTINS","MARIANA SANTOS PEREIRA","MARIANA COSTA PEREIRA","MARIA SILVA MARTINS","JOAO COSTA COSTA","JOAO RODRIGUES PEREIRA","MARIA SANTOS PEREIRA","ANA MARTINS SANTOS"],["F","M","M","M","M","M","","M","F","F","F","M","M","M"],["27/02/1973","14/03/1998","03/02/1972","09/06/1975","28/06/1975","16/08/1986","19/11/1981","20/04/1994","24/05/1982","27/04/1976","03/10/1998","08/11/1987","26/03/1973","04/05/1991"],["c6d20c81433bfcd0982ba1072cd06012","3e607fdb75c430a7d7c6d7b71601de9f","93a7bd17e88c98ee413453ae92f8a31d","f90a0202f39d346f48c5a545c66eed1a","2ba1c22e97ce51419f36a9eabdaf9de4","37ed4c60519de078002fa78ff905d385","4c627ca15ffcd009d67cffab00e3717b","a2cb1305dc0ab57a43f84894219b0199","d8a2b5f981a04e2837394dec9c5aef48","203e3d4376a5a9eb7eb6bd6caf6c3bf4","4aa0ba080f35dc2da591733da019bfc6","b99bc711175329b435d7d67cea296120","6d0dcdf0ed439ef10c59ec0a3c603d5a","6534e97ff1a0dc3651db56450f78a4f6"],["A500","C642","C642","C642","C642","J000","J200","J200","L200","L200","M600","M650","P360","P360"],["R362","S410","M635","C230","C230","S532","P660","S532","M635","C230","O416","P660","O416","M635"],["M650","M650","L200","A500","A535","J500","M650","M650","M650","M600","J000","J000","M600","A500"],["S532","M635","P660","P660","S532","S410","M635","P660","P660","M635","C230","P660","P660","S532"],[78,76,48,20,32,87,54,63,94,55,98,67,46,80],["ANNA OLIVEIRA RODRIGUES","CARLOS COSTA SILVA","CARLOS COSTA MARTINS","CARLOS SILVA COSTA","CARLOS MARTINS COSTA","JOAO PEREIRA SANTOS","JOSE SANTOS PEREIRA","JOSE PEREIRA SANTOS","LUISA SANTOS MARTINS","LUISA SILVA COSTA","MARIA SANTOS OLIVEIRA","MARIANNA SILVA PEREIRA","PEDRO COSTA OLIVEIRA","PEDRO SILVA MARTINS"],["MARIANA SANTOS SANTOS","MARIANA PEREIRA MARTINS","LUISA COSTA PEREIRA","ANA MARTINS PEREIRA","ANTONIA OLIVEIRA SANTOS","JOANA OLIVEIRA SILVA","MARIANA COSTA MARTINS","MARIANA SANTOS PEREIRA","MARIANA COSTA OLIVEIRA","MARIA SILVA MARTINS","JOAO COSTA COSTA","JOAO RODRIGUES PEREIRA","MARIA SANTOS PEREIRA","ANA MARTINS SANTOS"],["F","M","M","M","M","M","M","M","F","F","F","F","M","M"],["27/02/1973","14/03/1998","03/02/1972","09/06/1975","28/06/1975","15/08/1986","19/11/1981","20/04/1994","25/02/1998","27/04/1976","03/10/1998","08/11/1987","26/03/1973","04/05/1991"],["e4f1454b4c70352b7a2139482086e16d","3e607fdb75c430a7d7c6d7b71601de9f","93a7bd17e88c98ee413453ae92f8a31d","f90a0202f39d346f48c5a545c66eed1a","2ba1c22e97ce51419f36a9eabdaf9de4","a022b2c0bf1267980fcd432d79974c68","49b9b864c48cd1c58fd5afacead52b93","a2cb1305dc0ab57a43f84894219b0199","093a9f29b6694367aa379214de9518a2","203e3d4376a5a9eb7eb6bd6caf6c3bf4","4aa0ba080f35dc2da591733da019bfc6","b92e5b4263004b7f05ac2826d78dad78","6d0dcdf0ed439ef10c59ec0a3c603d5a","6534e97ff1a0dc3651db56450f78a4f6"],["A500","C642","C642","C642","C642","J000","J200","J200","L200","L200","M600","M650","P360","P360"],["R362","S410","M635","C230","C230","S532","P660","S532","M635","C230","O416","P660","O416","M635"],["M650","M650","L200","A500","A535","J500","M650","M650","M650","M600","J000","J000","M600","A500"],["S532","M635","P660","P660","S532","S410","M635","P660","O416","M635","C230","P660","P660","S532"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>.y<\/th>\n      <th>.x<\/th>\n      <th>id.x<\/th>\n      <th>nome.x<\/th>\n      <th>nome_mae.x<\/th>\n      <th>sexo.x<\/th>\n      <th>dt_nasc.x<\/th>\n      <th>hash.x<\/th>\n      <th>primeiro_nome.x<\/th>\n      <th>ultimo_nome.x<\/th>\n      <th>primeiro_nomemae.x<\/th>\n      <th>ultimo_nomemae.x<\/th>\n      <th>id.y<\/th>\n      <th>nome.y<\/th>\n      <th>nome_mae.y<\/th>\n      <th>sexo.y<\/th>\n      <th>dt_nasc.y<\/th>\n      <th>hash.y<\/th>\n      <th>primeiro_nome.y<\/th>\n      <th>ultimo_nome.y<\/th>\n      <th>primeiro_nomemae.y<\/th>\n      <th>ultimo_nomemae.y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"columnDefs":[{"className":"dt-right","targets":[1,2,3,13]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":".y","targets":1},{"name":".x","targets":2},{"name":"id.x","targets":3},{"name":"nome.x","targets":4},{"name":"nome_mae.x","targets":5},{"name":"sexo.x","targets":6},{"name":"dt_nasc.x","targets":7},{"name":"hash.x","targets":8},{"name":"primeiro_nome.x","targets":9},{"name":"ultimo_nome.x","targets":10},{"name":"primeiro_nomemae.x","targets":11},{"name":"ultimo_nomemae.x","targets":12},{"name":"id.y","targets":13},{"name":"nome.y","targets":14},{"name":"nome_mae.y","targets":15},{"name":"sexo.y","targets":16},{"name":"dt_nasc.y","targets":17},{"name":"hash.y","targets":18},{"name":"primeiro_nome.y","targets":19},{"name":"ultimo_nome.y","targets":20},{"name":"primeiro_nomemae.y","targets":21},{"name":"ultimo_nomemae.y","targets":22}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-483856039729a0902cee" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-483856039729a0902cee">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14"],[77,76,48,20,95,87,54,63,99,55,98,67,68,80],[78,76,48,20,32,87,54,63,94,55,98,67,46,80],["ANA OLIVEIRA RODRIGUES","CARLOS COSTA SILVA","CARLOS COSTA MARTINS","CARLOS SILVA COSTA","CARLOS MARTINS COSTA","JOAO PEREIRA SANTOS","JOSE SANTOS PEREIRA","JOSE PEREIRA SANTOS","LUISA OLIVEIRA MARTINS","LUISA SILVA COSTA","MARIA SANTOS OLIVEIRA","MARIANA SILVA PEREIRA","PEDRO COSTA OLIVEIRA","PEDRO SILVA MARTINS"],["ANNA OLIVEIRA RODRIGUES","CARLOS COSTA SILVA","CARLOS COSTA MARTINS","CARLOS SILVA COSTA","CARLOS MARTINS COSTA","JOAO PEREIRA SANTOS","JOSE SANTOS PEREIRA","JOSE PEREIRA SANTOS","LUISA SANTOS MARTINS","LUISA SILVA COSTA","MARIA SANTOS OLIVEIRA","MARIANNA SILVA PEREIRA","PEDRO COSTA OLIVEIRA","PEDRO SILVA MARTINS"],["MARIANA SANTOS SANTOS","MARIANA PEREIRA MARTINS","LUISA COSTA PEREIRA","ANA MARTINS PEREIRA","ANTONIA OLIVEIRA SANTOS","JOANA OLIVEIRA SILVA","MARIANA COSTA MARTINS","MARIANA SANTOS PEREIRA","MARIANA COSTA PEREIRA","MARIA SILVA MARTINS","JOAO COSTA COSTA","JOAO RODRIGUES PEREIRA","MARIA SANTOS PEREIRA","ANA MARTINS SANTOS"],["MARIANA SANTOS SANTOS","MARIANNA PEREIRA MARTINS","LUIZA COSTA PEREIRA","ANA MARTINS PEREIRA","ANTONIA OLIVEIRA SANTOS","JOANA OLIVEIRA SILVA","MARIANNA COSTA MARTINS","MARIANA SANTOS PEREIRA","MARIANNA COSTA OLIVEIRA","MARIA SILVA MARTINS","JOA COSTA COSTA","JOA RODRIGUES PEREIRA","MARIA SANTOS PEREIRA","ANA MARTINS SANTOS"],["F","M","M","M","M","M","","M","F","F","F","M","M","M"],["F","M","M","M","M","M","M","M","F","F","F","F","M","M"],["27/02/1973","14/03/1998","03/02/1972","09/06/1975","28/06/1975","16/08/1986","19/11/1981","20/04/1994","24/05/1982","27/04/1976","03/10/1998","08/11/1987","26/03/1973","04/05/1991"],["27/02/1973","14/03/1998","03/02/1972","09/06/1975","28/06/1975","15/08/1986","19/11/1981","20/04/1994","25/02/1998","27/04/1976","03/10/1998","08/11/1987","26/03/1973","04/05/1991"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>id.x<\/th>\n      <th>id.y<\/th>\n      <th>nome.x<\/th>\n      <th>nome.y<\/th>\n      <th>nome_mae.x<\/th>\n      <th>nome_mae.y<\/th>\n      <th>sexo.x<\/th>\n      <th>sexo.y<\/th>\n      <th>dt_nasc.x<\/th>\n      <th>dt_nasc.y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":7,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"id.x","targets":1},{"name":"id.y","targets":2},{"name":"nome.x","targets":3},{"name":"nome.y","targets":4},{"name":"nome_mae.x","targets":5},{"name":"nome_mae.y","targets":6},{"name":"sexo.x","targets":7},{"name":"sexo.y","targets":8},{"name":"dt_nasc.x","targets":9},{"name":"dt_nasc.y","targets":10}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[7,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
+</section>
 </section>
 </section>
 
