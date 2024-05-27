@@ -91,11 +91,11 @@ format:
 
 ![[Fonte: Fundamentos de Record Linkage e sua aplicação nas bases de dados do SUS](https://medium.com/psicodata/record-linkage-fundamentos-sus-31beb1aafd6b)](figuras/linkage_probabilistico.png){width=50, fig-align="center"}
 
-- Visando resolver as limitações do método determinístico, o probabilístico irá permitir que em um vetor de comparação os resultados não se limitem apenas a 0 (falso) ou 1 (verdadeiro), isso quer dizer que os registros podem ser parcialmente iguais.
+- Utilizando a mesma lógica do exemplo anterior, aqui podemos ver os mesmos indivíduos, porém com um atributo a mais (a data de nascimento).
+
+- Porém, visando resolver as limitações do método determinístico, o probabilístico irá permitir que em um vetor de comparação os resultados não se limitem apenas a 0 (falso) ou 1 (verdadeiro), isso quer dizer que os registros podem ser parcialmente iguais.
 
 ## *Linkage* Probabilístico
-
-- Utilizando a mesma lógica do exemplo anterior, aqui podemos ver os mesmos indivíduos, porém com um atributo a mais (a data de nascimento).
 
 - Apesar do nome está escrito de maneira distinta, as datas de nascimento são idênticas e portanto, o método probabilístico vai identificar (a partir de um critério pré-definindo) que existe uma alta probabilidade de que sejam os mesmos sujeitos nas bases distintas.
 
@@ -271,7 +271,25 @@ print(paste("Jaro-Winkler Similarity: ", jaro_winkler_sim))
 
 ![](figuras/IvanFelling.png){width=150, fig-align="center"}
 
-- O modelo Fellegi-Sunter (1969) é um método probabilístico para vinculação de registros que compara campos de diferentes registros, calcula pesos baseados nas probabilidades de correspondência (métricas de similaridade), e usa limiares de decisão para classificar pares como correspondências, não correspondências ou incertos.
+
+
+
+## Modelo Fellegi-Sunter (1969)
+
+1. **Comparação de Registros:** Os registros dos bancos de dados são comparados usando diversos campos, como nome, data de nascimento, endereço, etc.
+
+2. **Pontuação de Similaridade:** Cada campo comparado recebe uma pontuação baseada em quão semelhantes são os valores. Por exemplo, nomes que são muito parecidos recebem uma pontuação alta.
+
+3. **Regras de Decisão (modelo Fellegi-Sunter):** As pontuações são combinadas para calcular uma pontuação total para cada par de registros. O modelo define três categorias para essa pontuação:
+
+    - Match (Combinação): A pontuação é alta o suficiente para considerar que os registros pertencem à mesma entidade.
+    
+    - Non-Match (Não Combinação): A pontuação é baixa e os registros são considerados diferentes.
+
+    - Possible Match (Possível Combinação): A pontuação está em uma faixa intermediária, sugerindo que pode ser necessário revisar manualmente.
+    
+4. Ajuste dos Limiares: Os limiares que definem as categorias de combinação são ajustados para equilibrar a precisão (evitar falsos positivos) e a sensibilidade (evitar falsos negativos).
+
 
 <!-- ## Deduplicação -->
 
@@ -290,6 +308,10 @@ print(paste("Jaro-Winkler Similarity: ", jaro_winkler_sim))
 ## Pipeline *Linkage* entre SIM vs SINASC
 
 ![](figuras/pipe_line_sim_sinasc.png){width=350, fig-align="center"}
+
+ [Pipeline *Linkage* entre SIM vs SINASC](https://drive.google.com/file/d/1ilyO9knr6tGBIrvalyj5nkLtsocbYzFa/view?usp=sharing)
+
+
 
 ## Ferramentas para *Record Linkage*
 
