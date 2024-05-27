@@ -64,7 +64,7 @@ limpa_str <- function(x) {
 
 ## Lendo os bancos
 
-Estes serão os bancos sintéticos que iremos trabalhar: [banco1](https://drive.google.com/file/d/188pv7b-VcKG-1wDdr2XeRJBM9P_1VC0x/view?usp=drive_link) e [banco 2](https://drive.google.com/file/d/1ubzjx8LahmFRRi93SZe5SyW1wFowIy_6/view?usp=sharing)
+Estes serão as bases de dados sintéticas que iremos trabalhar: [banco1](https://drive.google.com/file/d/188pv7b-VcKG-1wDdr2XeRJBM9P_1VC0x/view?usp=drive_link) e [banco2](https://drive.google.com/file/d/1ubzjx8LahmFRRi93SZe5SyW1wFowIy_6/view?usp=sharing)
 
 ```{r}
 # Lendo o banco1
@@ -107,7 +107,7 @@ banco2 <- distinct(banco2)
 
 # Linkage Determinístico
 
-## **Opção 1:** Utilizando uma chave primária original
+## **Opção 1:** Utilizando uma chave primária "nativa"
 
 ```{r}
 # Vinculando as bases utilizando o id
@@ -223,7 +223,7 @@ datatable(pares, options = list(pageLength = 5))
 
 <p>- O registro 11 de x (o primeiro conjunto de dados) estão sendo comparados ao registros 8 de y (banco2).</p>
 
-<p>Os pares de registros devem ter o mesmo conteúdo das chaves de blocagem ("primeiro_nome", "ultimo_nome", "primeiro_nomemae").</p>
+<p>**OBS:** Os pares de registros devem ter o mesmo conteúdo das chaves de blocagem ("primeiro_nome", "ultimo_nome", "primeiro_nomemae").</p>
 
 #### **Passo 2:** Comparação dos pares utilizando a métrica de similaridade *Jaro Winkler*
 
@@ -233,7 +233,7 @@ tabela <- compare_pairs(pares, on = c("nome", "nome_mae", "dt_nasc"), default_co
 datatable(tabela, options = list(pageLength = 5))
 ```
  
-<p>- O registro 1 de x (banco1) estão sendo comparados ao registros 1 de y (banco2), está com probalidae de similaridade de $0.9855$ no nome. Isso está acontecendo porque no banco 1 o nome = "Ana de Oliveira Rodrigues" e no banco2 o nome = "Anna de Oliveira Rodrigues", veja:</p>
+<p>- O registro 1 de x (banco1) estão sendo comparados ao registros 1 de y (banco2), está com probalidade de similaridade de $0.9855$ no nome. Isso está acontecendo porque no banco 1 o nome = "Ana de Oliveira Rodrigues" e no banco2 o nome = "Anna de Oliveira Rodrigues", veja:</p>
 
 
 ```{r, echo=FALSE}
