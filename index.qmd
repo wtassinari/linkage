@@ -33,7 +33,7 @@ format:
 
 - O mais comum é utilizar as **chaves primárias** (identificador único) já existentes nas bases de dados (ex: CPF, CNS, NIS, DNV, prontuário, código do município, código do setor censitário, etc.) ou até mesmo os próprios atributos inerentes a cada registro (ex: nome, nome da mãe, data de nascimento, nome do bairro, etc.)
 
-- teste
+- teste3
 
 ::: aside
 *Fellegi IP & Sunter AB (1969) A theory for record linkage. Journal of the American Statistical Association 64, 1183-1210.*
